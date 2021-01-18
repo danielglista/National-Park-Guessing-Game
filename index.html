@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0"/>
+    <title>National Park Guessing Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div class="container">
+        <div class="status">
+            <p class="question-number">0 of 63</p>
+            <p class="score-display">Score: <span class="score">0</span></p>
+        </div>
+        <div class="card">
+            <div class="question-container">
+                <h2 class="park-name">Yosemite</h2>
+                <img class='park-img' src="images/yosemite.jpg" alt="Yosemite.jpg">
+                <p class="park-description">Not just a great valley, but a shrine to human foresight, the strength of granite, the power of glaciers, the persistence of life, and the tranquility of the High Sierra. First protected in 1864, Yosemite National Park is best known for its waterfalls, but within its nearly 1,200 square miles, you can find deep valleys, grand meadows, ancient giant sequoias, a vast wilderness area, and much more.</p>
+            </div>
+
+            <div class="buttons-container">
+                <div class="input-buttons">
+                <input class='text-input' list="states" name="state" placeholder="State"/>
+                    <datalist id="states">
+                        <option value="Alaska">Alaska</option>
+                        <option value="Virginia">Virginia</option>
+                        <option value="Arizona">Arizona</option>
+                    </datalist>
+
+                    <input class='btn btn-amber-outline' type="button" value='Submit' />
+                </div>
+
+                <input class='btn btn-green-outline' type="button" value='Hint' />
+            </div>
+        </div>
+        <div class="progress-table">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Park</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+    <script src='script.js'></script>
+
+</body>
+</html>
