@@ -34,10 +34,17 @@ function getNextPark() {
 }
 
 function renderQuestion(park) {
-    document.querySelector('.park-name').innerHTML = park.fullName.replace(/national|park/ig, '');
-    document.querySelector('.park-img').setAttribute('src', park.images[0].url);
-    document.querySelector('.park-description').innerHTML = park.description;
+   
+    let img = new Image;
+    img.addEventListener('load', () => {
+        document.querySelector('.park-name').innerHTML = park.fullName.replace(/national|park/ig, '');
+        document.querySelector('.park-img').src = img.src;
+        document.querySelector('.park-description').innerHTML = park.description;
+    })
+    img.src = park.images[0].url;
     return park.states;
+   // document.querySelector('.park-img').setAttribute('src', park.images[0].url);
+    
 }
 
 
@@ -45,7 +52,8 @@ function renderAnswer(correctAnswer) {
     const userAnswer = getStateTwoDigitCode(document.querySelector('.text-input').value);
     if (correctAnswer.includes(userAnswer)) {
         console.log('yay!')
-        document.querySelector('.question-container').style.left = '-1000px';
+        //document.querySelector('.question-container').style.left = '-1000px';
+        return true;
     }
 }
 
@@ -60,8 +68,25 @@ getNPSData( (jsonRes) => {
     let parkIterator = 0;
     const numberOfParks = parks.length;
     generateRandomParkOrder(parks);
-    let correctAnswer = renderQuestion(parks[parkIterator]);
 
-    document.querySelector('.btn-submit').addEventListener('click', () => {renderAnswer(correctAnswer)});
+    let correctAnswer = renderQuestion(parks[parkIterator++]);
+
+    document.addEventListener('keypress', (e) => {
+
+        if (e.key == 'Enter') {
+            if (renderAnswer(correctAnswer) && parkIterator < numberOfParks) {
+                correctAnswer = renderQuestion(parks[parkIterator++]);
+                console.log(correctAnswer)
+            }
+        }
+    })
+
+    document.querySelector('.btn-submit').addEventListener('click', () => {
+        if (renderAnswer(correctAnswer) && parkIterator < numberOfParks) {
+            correctAnswer = renderQuestion(parks[parkIterator++]);
+            console.log(correctAnswer)
+        }
+
+    });
 
 });
