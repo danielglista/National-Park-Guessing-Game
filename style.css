@@ -44,11 +44,15 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    overflow: hidden;
 }
 
 .question-container {
     padding: 0 1rem;
     color: var(--amber);
+    position: relative;
+    left: 0px;
+    transition: left 1s;
 }
 
 .question-container h2 {
@@ -62,6 +66,10 @@ img {
     height: 216px;
     /* height: calc(40vw); */
     object-fit: cover;
+}
+
+i.icon-green {
+    color: var(--green)
 }
 
 .buttons-container {
