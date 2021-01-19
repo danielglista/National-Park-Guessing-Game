@@ -35,13 +35,13 @@ function getNextPark() {
 
 function renderQuestion(park) {
    
-    let img = new Image;
-    img.addEventListener('load', () => {
+    //let img = new Image;
+    //img.addEventListener('load', () => {
         document.querySelector('.park-name').innerHTML = park.fullName.replace(/national|park/ig, '');
-        document.querySelector('.park-img').src = img.src;
+        document.querySelector('.park-img').src = park.img;
         document.querySelector('.park-description').innerHTML = park.description;
-    })
-    img.src = park.images[0].url;
+    //})
+    //img.src = park.images[0].url;
     return park.states;
    // document.querySelector('.park-img').setAttribute('src', park.images[0].url);
     
@@ -53,8 +53,22 @@ function renderAnswer(correctAnswer) {
     if (correctAnswer.includes(userAnswer)) {
         console.log('yay!')
         //document.querySelector('.question-container').style.left = '-1000px';
-        return true;
+        document.querySelector('.answer-container i').className = 'far fa-check-square fa-9x green';
+        document.querySelector('.answer-container h1').className = 'green';
+        document.querySelector('.answer-container h1').innerHTML = '+100';
+        document.querySelector('.answer-container input').classList.add('btn-green-outline');
+        document.querySelector('.answer-container input').classList.remove('btn-red-outline');
+        document.querySelector('.answer-container').style.left = '0';
+    } else {
+        document.querySelector('.answer-container i').className = 'fas fa-times fa-9x red';
+        document.querySelector('.answer-container h1').className = '';
+        document.querySelector('.answer-container h1').innerHTML = '';
+        document.querySelector('.answer-container input').classList.add('btn-red-outline');
+        document.querySelector('.answer-container input').classList.remove('btn-green-outline');
+        document.querySelector('.answer-container').style.left = '0';
     }
+
+    return true;
 }
 
 getNPSData( (jsonRes) => {
@@ -69,15 +83,22 @@ getNPSData( (jsonRes) => {
     const numberOfParks = parks.length;
     generateRandomParkOrder(parks);
 
-    let correctAnswer = renderQuestion(parks[parkIterator++]);
+    let img = new Image;
+    let correctAnswer = '';
+
+    img.addEventListener('load', () => {
+        parks[parkIterator].img = img.src;
+        correctAnswer = renderQuestion(parks[parkIterator++]);
+    })
+    img.src = parks[parkIterator].images[0].url;
 
     document.addEventListener('keypress', (e) => {
-
         if (e.key == 'Enter') {
-            if (renderAnswer(correctAnswer) && parkIterator < numberOfParks) {
-                correctAnswer = renderQuestion(parks[parkIterator++]);
-                console.log(correctAnswer)
-            }
+            renderAnswer(correctAnswer);
+            img.addEventListener('load', () => {
+                parks[parkIterator].img = img.src;
+            })
+            img.src = parks[parkIterator].images[0].url;
         }
     })
 
@@ -86,7 +107,11 @@ getNPSData( (jsonRes) => {
             correctAnswer = renderQuestion(parks[parkIterator++]);
             console.log(correctAnswer)
         }
-
     });
+
+    document.querySelector('.btn-next').addEventListener('click', () => {
+        console.log('test')
+        correctAnswer = renderQuestion(parks[parkIterator]);
+    })
 
 });
