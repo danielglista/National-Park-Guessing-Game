@@ -37,7 +37,9 @@ function renderQuestion(park) {
     let img = new Image;
 
     img.addEventListener('load', () => {
-        document.querySelector('.park-name').innerHTML = park.fullName.replace(/national|preserve|park/ig, '');
+        document.querySelector('.park-name').innerHTML = park.fullName.replace(/\b(national+.*of|national|preserve|park|parks|state|and)\b/ig, '')
+        .replace(/&/, '')
+        .replace(/(river.*)(river)/ig, '$1');
         document.querySelector('.park-img').src = img.src;
         document.querySelector('.park-description').innerHTML = park.description;
     })
@@ -96,7 +98,10 @@ function renderAnswer(correctAnswer, park) {
         }
         stateNamesString += getStateFullName(correctStates[i]);
     }
-    document.querySelector('.state-answer').innerHTML = stateNamesString + ' - ' + park.fullName.replace(/national|preserve|park/ig, '');
+    //document.querySelector('.state-answer').innerHTML = stateNamesString + ' - ' + park.fullName.replace(/national|preserve|park/ig, '');
+    document.querySelector('.state-answer').innerHTML = stateNamesString + ' - ' + park.fullName.replace(/\b(national+.*of|national|preserve|park|parks|state|and)\b/ig, '')
+    .replace(/&/, '')
+    .replace(/(river.*)(river)/ig, '$1');
 }
 
 function displayAnsewr() {
@@ -137,11 +142,15 @@ getNPSData( (jsonRes) => {
     let correctAnswer = renderQuestion(parks[parkIterator]);
 
 
-    document.addEventListener('keypress', (e) => {
+    document.addEventListener('keyup', (e) => {
         if (e.key == 'Enter') {
-            renderAnswer(correctAnswer, parks[parkIterator++]);
-            displayAnsewr();
-            setTimeout(() => {correctAnswer = renderQuestion(parks[parkIterator])}, wipeTransitionTime );
+            if (document.querySelector('.question-mask').style.zIndex == 10 && !document.querySelector('.btn-submit').classList.contains('disabled')) {
+                renderAnswer(correctAnswer, parks[parkIterator++]);
+                displayAnsewr();
+                setTimeout(() => {correctAnswer = renderQuestion(parks[parkIterator])}, wipeTransitionTime );
+            } else  if (document.querySelector('.answer-mask').style.zIndex == 10 && !document.querySelector('.btn-next').classList.contains('disabled')) {
+                displayQuestion();
+            }
         }
     })
 
