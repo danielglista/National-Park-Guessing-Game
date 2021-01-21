@@ -1,3 +1,5 @@
+const wipeTransitionTime = 1000;
+
 function getNPSData(callback) {
     fetch('https://developer.nps.gov/api/v1/parks?limit=500', {
         method: 'GET',
@@ -29,22 +31,37 @@ function generateRandomParkOrder(array) {
     return array;
 }
 
-function getNextPark() {
-     
-}
 
 function renderQuestion(park) {
-   
-    //let img = new Image;
-    //img.addEventListener('load', () => {
-        document.querySelector('.park-name').innerHTML = park.fullName.replace(/national|park/ig, '');
-        document.querySelector('.park-img').src = park.img;
+
+    let img = new Image;
+
+    img.addEventListener('load', () => {
+        document.querySelector('.park-name').innerHTML = park.fullName.replace(/national|preserve|park/ig, '');
+        document.querySelector('.park-img').src = img.src;
         document.querySelector('.park-description').innerHTML = park.description;
-    //})
-    //img.src = park.images[0].url;
-    return park.states;
-   // document.querySelector('.park-img').setAttribute('src', park.images[0].url);
+    })
+
+    img.src = park.images[0].url;
+
+
     
+    return park.states;
+    
+}
+
+
+function displayQuestion() {
+    document.querySelector('.answer-mask').style.width = 0;
+    document.querySelector('.text-input').value = '';
+
+
+    setTimeout( () => {
+        document.querySelector('.answer-mask').style.zIndex = 5;
+        document.querySelector('.question-mask').style.zIndex = 10;
+        document.querySelector('.answer-mask').style.width = '100%';
+        document.querySelector('.btn-submit').classList.remove('disabled');
+    }, wipeTransitionTime)
 }
 
 
@@ -52,23 +69,44 @@ function renderAnswer(correctAnswer) {
     const userAnswer = getStateTwoDigitCode(document.querySelector('.text-input').value);
     if (correctAnswer.includes(userAnswer)) {
         console.log('yay!')
-        //document.querySelector('.question-container').style.left = '-1000px';
-        document.querySelector('.answer-container i').className = 'far fa-check-square fa-9x green';
-        document.querySelector('.answer-container h1').className = 'green';
+        document.querySelector('.answer-container').className = document.querySelector('.answer-container').className.replace('red', 'green');
+        document.querySelector('.answer-container i').className = 'far fa-check-square fa-9x';
+        document.querySelector('.answer-container h1').className = '';
         document.querySelector('.answer-container h1').innerHTML = '+100';
         document.querySelector('.answer-container input').classList.add('btn-green-outline');
         document.querySelector('.answer-container input').classList.remove('btn-red-outline');
-        document.querySelector('.answer-container').style.left = '0';
+        // document.querySelector('.answer-container').style.left = '0';
     } else {
-        document.querySelector('.answer-container i').className = 'fas fa-times fa-9x red';
+        document.querySelector('.answer-container').className = document.querySelector('.answer-container').className.replace('green', 'red');
+        document.querySelector('.answer-container i').className = 'fas fa-times fa-9x';
         document.querySelector('.answer-container h1').className = '';
         document.querySelector('.answer-container h1').innerHTML = '';
         document.querySelector('.answer-container input').classList.add('btn-red-outline');
         document.querySelector('.answer-container input').classList.remove('btn-green-outline');
-        document.querySelector('.answer-container').style.left = '0';
+        // document.querySelector('.answer-container').style.left = '0';
     }
 
     return true;
+}
+
+function displayAnsewr() {
+    document.querySelector('.question-mask').style.width = 0;
+    document.querySelector('.btn-submit').classList.add('disabled');
+    document.querySelector('.btn-next').classList.add('disabled');
+
+    setTimeout( () => {
+        document.querySelector('.question-mask').style.zIndex = 5;
+        document.querySelector('.answer-mask').style.zIndex = 10;
+        document.querySelector('.question-mask').classList.add('no-transitions');
+        setTimeout( () => {
+            document.querySelector('.question-mask').style.width = '100%';
+            setTimeout( () => {
+                document.querySelector('.btn-next').classList.remove('disabled');
+                document.querySelector('.question-mask').classList.remove('no-transitions');
+            }, 0);
+ 
+        }, 0)
+    }, wipeTransitionTime)
 }
 
 getNPSData( (jsonRes) => {
@@ -82,36 +120,26 @@ getNPSData( (jsonRes) => {
     let parkIterator = 0;
     const numberOfParks = parks.length;
     generateRandomParkOrder(parks);
+     
+    let correctAnswer = renderQuestion(parks[parkIterator++]);
 
-    let img = new Image;
-    let correctAnswer = '';
-
-    img.addEventListener('load', () => {
-        parks[parkIterator].img = img.src;
-        correctAnswer = renderQuestion(parks[parkIterator++]);
-    })
-    img.src = parks[parkIterator].images[0].url;
 
     document.addEventListener('keypress', (e) => {
         if (e.key == 'Enter') {
             renderAnswer(correctAnswer);
-            img.addEventListener('load', () => {
-                parks[parkIterator].img = img.src;
-            })
-            img.src = parks[parkIterator].images[0].url;
+            displayAnsewr();
+            setTimeout(() => {correctAnswer = renderQuestion(parks[parkIterator++])}, wipeTransitionTime );
         }
     })
 
-    document.querySelector('.btn-submit').addEventListener('click', () => {
-        if (renderAnswer(correctAnswer) && parkIterator < numberOfParks) {
-            correctAnswer = renderQuestion(parks[parkIterator++]);
-            console.log(correctAnswer)
-        }
+    document.querySelector('.btn-submit').addEventListener('click', (e) => {
+        renderAnswer(correctAnswer);
+        displayAnsewr();
+        setTimeout(() => {correctAnswer = renderQuestion(parks[parkIterator++])}, wipeTransitionTime );
     });
 
     document.querySelector('.btn-next').addEventListener('click', () => {
-        console.log('test')
-        correctAnswer = renderQuestion(parks[parkIterator]);
+        displayQuestion();
     })
 
 });

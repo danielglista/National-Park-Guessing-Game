@@ -43,18 +43,40 @@ body {
     width: 100%;
     height: 575px;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    /* flex-direction: column;
+    justify-content: space-between; */
     overflow: hidden;
     position: relative;
+}
+
+.question-mask, .answer-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+    transition: width 1s linear;
+}
+
+.no-transitions {
+    transition: all 0s !important;
+}
+
+.question-mask {
+    z-index: 10;
+}
+
+.answer-mask {
+    z-index: 5;
 }
 
 .question-container {
     padding: 0 1rem;
     color: var(--amber);
+    background-color: var(--black);
     position: relative;
-    left: 0px;
-    transition: left 1s;
+    width: calc(100vw - 2rem);
 }
 
 .question-container h2 {
@@ -66,19 +88,16 @@ body {
 img {
     width: 100%;
     height: 216px;
-    /* height: calc(40vw); */
     object-fit: cover;
 }
 
 .answer-container {
     position: absolute;
-    left: calc(100%);
+    left: 0;
     top: 0;
-    z-index: 10;
-    width: 100%;
+    width: calc(100vw - 2rem);
     height: 500px;
     background-color: var(--black);
-    transition: left 2s linear;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -93,6 +112,7 @@ img {
 
 
 .buttons-container {
+    align-self: flex-end;
     width: 100%;
     padding: 1rem;
     display: flex;
@@ -106,6 +126,7 @@ img {
     text-transform: uppercase;
     padding: 10px;
     background-color: transparent;
+    cursor: pointer;
 }
 
 .btn-amber-outline {
@@ -121,6 +142,12 @@ img {
 .btn-red-outline {
     color: var(--red);
     border: 1px solid var(--red);
+}
+
+.btn.disabled {
+    cursor: default;
+    pointer-events: none;
+    filter: brightness(0.7)
 }
 
 
@@ -194,6 +221,14 @@ td {
     img {
         height: 20vw;
     }
+
+    .question-container {
+        width: calc(50vw - 2rem);
+    }
+    
+    .answer-container {
+        width: calc(50vw - 2rem);
+    }
 }
 
 @media (min-width: 576px) and (max-width: 991px) {
@@ -203,6 +238,14 @@ td {
 
     img {
         height: 30vw;
+    }
+
+    .question-container {
+        width: calc(75vw - 2rem);
+    }
+
+    .answer-container {
+        width: calc(75vw - 2rem);
     }
 }
 
