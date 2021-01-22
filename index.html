@@ -17,90 +17,10 @@
             <p>Score: <span class="score" data-score='0'>0</span></p>
         </div>
         <div class="card">
-            <div class="question-mask"  style='z-index: 10;'>
-                <div class="question-container crt">
-                    <h2 class="park-name"></h2>
-                    <img class='park-img' src="" alt="">
-                    <p class="park-description"></p>
-                </div>
-            </div>
-
-            <div class="answer-mask" style='z-index: 5;'>
-                <div class='answer-container green crt'>
-                    <i class="far fa-9x"></i>
-                    <h1></h1>
-                    <p class='state-answer'></p>
-                    <input class='btn btn-next'type='button' value='Next' />
-                </div>
-            </div>
-
-            <div class="buttons-container">
-                <div class="input-buttons">
-                <input class='text-input' list="states" name="state" placeholder="State"/>
-                    <datalist id="states">
-                        <option value="Alabama">Alabama</option>
-                        <option value="Alaska">Alaska</option>
-                        <option value='American Samoa'>American Samoa</option>
-                        <option value="Arizona">Arizona</option>
-                        <option value="Arkansas">Arkansas</option>
-                        <option value="California">California</option>
-                        <option value="Colorado">Colorado</option>
-                        <option value="Connecticut">Connecticut</option>
-                        <option value="Delaware">Delaware</option>
-                        <option value="District of Columbia">District of Columbia</option>
-                        <option value="Florida">Florida</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Hawaii">Hawaii</option>
-                        <option value="Idaho">Idaho</option>
-                        <option value="Illinois">Illinois</option>
-                        <option value="Indiana">Indiana</option>
-                        <option value="Iowa">Iowa</option>
-                        <option value="Kansas">Kansas</option>
-                        <option value="Kentucky">Kentucky</option>
-                        <option value="Louisiana">Louisiana</option>
-                        <option value="Maine">Maine</option>
-                        <option value="Maryland">Maryland</option>
-                        <option value="Massachusetts">Massachusetts</option>
-                        <option value="Michigan">Michigan</option>
-                        <option value="Minnesota">Minnesota</option>
-                        <option value="Mississippi">Mississippi</option>
-                        <option value="Missouri">Missouri</option>
-                        <option value="Montana">Montana</option>
-                        <option value="Nebraska">Nebraska</option>
-                        <option value="Nevada">Nevada</option>
-                        <option value="New Hampshire">New Hampshire</option>
-                        <option value="New Jersey">New Jersey</option>
-                        <option value="New Mexico">New Mexico</option>
-                        <option value="New York">New York</option>
-                        <option value="North Carolina">North Carolina</option>
-                        <option value="North Dakota">North Dakota</option>
-                        <option value="Ohio">Ohio</option>
-                        <option value="Oklahoma">Oklahoma</option>
-                        <option value="Oregon">Oregon</option>
-                        <option value="Pennsylvania">Pennsylvania</option>
-                        <option value="Rhode Island">Rhode Island</option>
-                        <option value="South Carolina">South Carolina</option>
-                        <option value="South Dakota">South Dakota</option>
-                        <option value="Tennessee">Tennessee</option>
-                        <option value="Texas">Texas</option>
-                        <option value="Utah">Utah</option>
-                        <option value="Vermont">Vermont</option>
-                        <option value='Virgin Islands'>Virgin Islands</option>
-                        <option value="Virginia">Virginia</option>
-                        <option value="Washington">Washington</option>
-                        <option value="West Virginia">West Virginia</option>
-                        <option value="Wisconsin">Wisconsin</option>
-                        <option value="Wyoming">Wyoming</option>
-                    </datalist>
-
-                    <input class='btn btn-amber-outline btn-submit' type="button" value='Submit' />
-                </div>
-
-                <input class='btn btn-green-outline btn-hint' type="button" value='Hint' />
-            </div>
+            
         </div>
-        <div class="progress-table">
-            <table>
+        <div class="progress-table-container hidden">
+            <table class='progress-table'>
                 <tbody>
                     <tr>
                         <td>State</td>
@@ -170,6 +90,7 @@
 
 
     <script src='utilities.js'></script>
+    <script src='pages.js'></script>
     <script src='script.js'></script>
 
 </body>

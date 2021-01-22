@@ -42,11 +42,24 @@ body {
     border: 2px solid var(--green);
     width: 100%;
     height: 575px;
-    display: flex;
-    /* flex-direction: column;
-    justify-content: space-between; */
+    /* display: flex;
+    flex-direction: column; */
     overflow: hidden;
     position: relative;
+    padding: 1rem;
+}
+
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 90%;
+    width: 100%;
+}
+
+.question-slider-container {
+    width: 250px;
 }
 
 .question-mask, .answer-mask {
@@ -79,13 +92,6 @@ body {
     width: calc(100vw - 2rem);
 }
 
-.question-container h2 {
-    font-style: italic;
-    font-weight: bold;
-    text-align: center;
-    font-family: 'Courier Prime', monospace;
-}
-
 img {
     width: 100%;
     height: 216px;
@@ -109,16 +115,16 @@ img {
     position: relative;
 }
 
-
-
-
 .buttons-container {
-    align-self: flex-end;
-    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
     padding: 1rem;
+    width: 100%;
     display: flex;
     justify-content: space-between;
 }
+
 
 
 .btn {
@@ -160,7 +166,7 @@ img {
     border: 1px solid #FFBB00;
 }
 
-.progress-table{
+.progress-table-container{
     margin: 1rem 0;
     padding: 0 1rem;
     width: 100%;
@@ -174,30 +180,124 @@ table {
 }
 
 
-tr {
+.progress-table tr {
     margin: auto;
     padding: 2px 0;
     display: flex;
     justify-content: space-between;
 }
 
-td {
+.progress-table td {
     color: var(--amber);
     text-transform: uppercase;
 }
 
+
+.results-container {
+    width: 100%;
+    margin-bottom: 3rem;
+}
+
+.results-container * {
+    margin: 1rem 0;
+}
+
+.results-table-container {
+    width: 100%;
+    margin: 0 auto;
+    height: 300px;
+    padding: 0 0.5rem;
+    display: block;
+    overflow-y: scroll;
+}
+
+.results-table tr:first-of-type {
+    font-weight: bold;
+    font-size: 18px;
+}
+/* 
+.results-table td {
+    width: 33%;
+} */
+
+.results-table tr td:last-of-type {
+    text-align: right;
+    width: 25%;
+}
+
+.result-table tr td:first-of-type {
+    width: 50%;
+}
+
+.btn-restart {
+    margin: 0 auto;
+}
+
+.flex {
+    display: flex;
+}
+
 ::-webkit-scrollbar {
     width: 3px;
-  }
+}
   
-  ::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
     background: var(--black);
-  }
-  
+}
 
-  ::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     background: var(--amber);
     border-radius: 500px;
+}
+
+input[type=range] {
+    -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+    width: 100%; /* Specific width is required for Firefox. */
+    background: transparent; /* Otherwise white in Chrome */
+  }
+  
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px;
+    width: 8px;
+    background: var(--amber);
+    cursor: pointer;
+    margin-top: -6.5px;
+  }
+
+  input[type=range]::-moz-range-thumb {
+    height: 16px;
+    width: 8px;
+    background: var(--amber);
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: var(--green);
+    border-radius: 2px;
+  }
+
+  input[type=range]::-moz-range-track-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: var(--green);
+    border-radius: 2px;
+  }
+
+  input[type=range]:active::-webkit-slider-runnable-track {
+    filter: brightness(0.8);
+  }
+
+  input[type=range]:active::-moz-range-track-track {
+    filter: brightness(0.8);
+  }
+  
+  input[type=range]:focus {
+    outline: none;
   }
 
 
@@ -211,6 +311,27 @@ td {
 
 .red {
     color: var(--red);
+}
+
+.bold {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.hidden {
+    visibility: hidden;
 }
 
 
@@ -230,6 +351,10 @@ td {
     .answer-container {
         width: calc(50vw - 2rem);
     }
+
+    .results-table-container {
+        width: 50%;
+    }
 }
 
 @media (min-width: 576px) and (max-width: 991px) {
@@ -247,6 +372,10 @@ td {
 
     .answer-container {
         width: calc(75vw - 2rem);
+    }
+
+    .results-table-container {
+        width: 75%;
     }
 }
 
