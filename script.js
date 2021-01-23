@@ -76,7 +76,7 @@ function renderAnswer(correctAnswer, park) {
     if (correctAnswer.includes(userAnswer)) {
         console.log('yay!')
         document.querySelector('.answer-container').className = document.querySelector('.answer-container').className.replace('red', 'green');
-        document.querySelector('.answer-container i').className = 'far fa-check-square fa-9x';
+        document.querySelector('.answer-container i').className = 'fas fa-check fa-9x';
         document.querySelector('.answer-container h1').innerHTML = '+1';
         document.querySelector('.answer-container input').classList.add('btn-green-outline');
         document.querySelector('.answer-container input').classList.remove('btn-red-outline');
