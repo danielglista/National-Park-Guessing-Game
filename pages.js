@@ -12,46 +12,6 @@ function renderMenuPage() {
     `;
 }
 
-function renderResultsPage() {
-    let results = `
-        <div class='results-container amber'>
-            <h1 class='text-center'>Thank You For Playing</h1>
-            <h2>Results:</h2>
-            <div class='results-table-container'>
-                <table class='results-table'>
-                    <tbody>
-                        <tr>
-                            <td>Total</td>
-                            <td>${(document.querySelector('.score').innerHTML)}/${document.querySelector('.question-total').innerHTML}</td>
-                            <td>${Math.floor(parseInt(document.querySelector('.score').innerHTML)/parseInt(document.querySelector('.question-total').innerHTML)*100)}%</td>
-                        </tr>
-    `;
-
-    for (let i in stateNameList) {
-        if (states[i].numberOfParks > 0) {
-            results += `
-                <tr>
-                    <td>${getStateFullName(i)}</td>
-                    <td>${states[i].correctParks}/${states[i].numberOfParks}</td>
-                    <td>${Math.floor(states[i].correctParks/states[i].numberOfParks*100)}%</td>
-                </tr>
-            `;
-        }
-    }
-
-    results += `
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class='flex'>
-            <input class='btn btn-amber-outline btn-restart' type="button" value='Restart' />
-        </div>
-    `;
-
-    return results;
-}
-
 function renderGamePage() {
     let game = `
     <div class="question-mask"  style='z-index: 10;'>
@@ -133,9 +93,51 @@ function renderGamePage() {
             <input class='btn btn-amber-outline btn-submit' type="button" value='Submit' />
         </div>
 
-        <input class='btn btn-green-outline btn-hint' type="button" value='Hint' />
+        <input class='btn btn-green-outline btn-hint hidden' type="button" value='Hint' />
     </div>
     `;
 
     return game;
 }
+
+function renderResultsPage() {
+    let results = `
+        <div class='results-container amber'>
+            <h1 class='text-center'>Thank You For Playing</h1>
+            <h2>Results:</h2>
+            <div class='results-table-container'>
+                <table class='results-table'>
+                    <tbody>
+                        <tr>
+                            <td>Total</td>
+                            <td>${(document.querySelector('.score').innerHTML)}/${document.querySelector('.question-total').innerHTML}</td>
+                            <td>${Math.floor(parseInt(document.querySelector('.score').innerHTML)/parseInt(document.querySelector('.question-total').innerHTML)*100)}%</td>
+                        </tr>
+    `;
+
+    for (let i in stateNameList) {
+        if (states[i].numberOfParks > 0) {
+            results += `
+                <tr>
+                    <td>${getStateFullName(i)}</td>
+                    <td>${states[i].correctParks}/${states[i].numberOfParks}</td>
+                    <td>${Math.floor(states[i].correctParks/states[i].numberOfParks*100)}%</td>
+                </tr>
+            `;
+        }
+    }
+
+    results += `
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class='flex'>
+            <!-- <input class='btn btn-amber-outline btn-restart' type="button" value='Restart' /> -->
+            <a class='btn btn-green-outline' href='https://www.nps.gov/learnandexplore/index.htm' target="_blank" rel="noopener noreferrer">EXPLORE</a>
+        </div>
+    `;
+
+    return results;
+}
+

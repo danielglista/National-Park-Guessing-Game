@@ -73,7 +73,7 @@ body {
 }
 
 .no-transitions {
-    transition: all 0s !important;
+    transition: all 0s linear !important;
 }
 
 /* .question-mask {
@@ -237,6 +237,11 @@ table {
     display: flex;
 }
 
+a {
+    text-decoration: none;
+    margin: 0 auto;
+}
+
 ::-webkit-scrollbar {
     width: 3px;
 }
@@ -289,11 +294,11 @@ input[type=range] {
   }
 
   input[type=range]:active::-webkit-slider-runnable-track {
-    filter: brightness(0.8);
+    filter: brightness(0.7);
   }
 
   input[type=range]:active::-moz-range-track-track {
-    filter: brightness(0.8);
+    filter: brightness(0.7);
   }
   
   input[type=range]:focus {

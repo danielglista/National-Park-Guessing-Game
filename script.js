@@ -1,6 +1,7 @@
 
 
-const wipeTransitionTime = 1000; // in milliseconds
+let debug = 2; // To be fixed in next release
+const wipeTransitionTime = 1000*debug; // in milliseconds
 
 function getNPSData(callback) {
     fetch('nps.json', {
@@ -35,9 +36,7 @@ function renderQuestion(park) {
     let img = new Image;
 
     img.addEventListener('load', () => {
-        document.querySelector('.park-name').innerHTML = park.fullName.replace(/\b(national+.*of|national|preserve|park|parks|state|and)\b/ig, '')
-        .replace(/&/, '')
-        .replace(/(river.*)(river)/ig, '$1');
+        document.querySelector('.park-name').innerHTML = park.name;
         document.querySelector('.park-img').src = img.src;
         document.querySelector('.park-description').innerHTML = park.description.replace(/Alabama|Alaska|American Samoa|Arizona|Arkansa|California|Colorado|Connecticut|Delaware|District of Columbia|Federated States of Micronesia|Florida|Georgia|Guam|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Marshall Islands|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Northern Mariana Islands|Ohio|Oklahoma|Oregon|Palau|Pennsylvania|Puerto Rico|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virgin Island|Virginia|Washington|West Virginia|Wisconsin|Wyoming/ig, '_____');
     })
@@ -107,12 +106,10 @@ function renderAnswer(correctAnswer, park) {
         stateNamesString += getStateFullName(correctStates[i]);
     }
 
-    document.querySelector('.state-answer').innerHTML = stateNamesString + ' - ' + park.fullName.replace(/\b(national+.*of|national|preserve|park|parks|state|and)\b/ig, '')
-    .replace(/&/, '')
-    .replace(/(river.*)(river)/ig, '$1');
+    document.querySelector('.state-answer').innerHTML = stateNamesString + ' - ' + park.name;
 }
 
-function displayAnsewr() {
+function displayAnswer() {
     document.querySelector('.question-mask').style.width = 0;
     document.querySelector('.btn-submit').classList.add('disabled');
 
@@ -120,14 +117,11 @@ function displayAnsewr() {
         document.querySelector('.question-mask').style.zIndex = 5;
         document.querySelector('.answer-mask').style.zIndex = 10;
         document.querySelector('.question-mask').classList.add('no-transitions');
+        document.querySelector('.question-mask').style.width = '100%';
         setTimeout( () => {
-            document.querySelector('.question-mask').style.width = '100%';
-            setTimeout( () => {
-                document.querySelector('.btn-next').classList.remove('disabled');
-                document.querySelector('.question-mask').classList.remove('no-transitions');
-            }, 0);
- 
-        }, 0)
+            document.querySelector('.btn-next').classList.remove('disabled');
+            document.querySelector('.question-mask').classList.remove('no-transitions');
+        }, 10);
     }, wipeTransitionTime)
 }
 
@@ -148,7 +142,7 @@ function menuPage() {
     });
 }
 
-function gamePage(data, numberOfParks) {
+function gamePage(data, numberOfQuestions) {
 
     document.querySelector('.card').innerHTML = renderGamePage();
 
@@ -167,13 +161,33 @@ function gamePage(data, numberOfParks) {
     }
 
     let parkIterator = 0;
-    document.querySelector('.question-total').innerHTML = numberOfParks;
+    document.querySelector('.question-counter').innerHTML = 1;
+    document.querySelector('.question-total').innerHTML = numberOfQuestions;
+    document.querySelector('.score').innerHTML = 0;
 
     generateRandomParkOrder(parks);
     
     let correctAnswer = renderQuestion(parks[parkIterator]);
 
-    document.addEventListener('keyup', (e) => {
+    document.addEventListener('keyup', keyboardHandler);
+
+    document.querySelector('.btn-submit').addEventListener('click', () => {
+        submitBtnHandler();
+    });
+
+    document.querySelector('.btn-submit').addEventListener('keypress', (e) => {
+        e.preventDefault();
+    });
+
+    document.querySelector('.btn-next').addEventListener('click', () => {
+        nextBtnHandler()
+    })
+
+    document.querySelector('.btn-next').addEventListener('keypress', (e) => {
+        e.preventDefault();
+    });
+
+    function keyboardHandler(e) {
         if (e.key == 'Enter') {
             if (document.querySelector('.question-mask').style.zIndex == 10 && !document.querySelector('.btn-submit').classList.contains('disabled')) {
                 // When question is displayed
@@ -183,26 +197,19 @@ function gamePage(data, numberOfParks) {
                 nextBtnHandler();
             }
         }
-    })
-
-    document.querySelector('.btn-submit').addEventListener('click', () => {
-        submitBtnHandler();
-    });
-
-    document.querySelector('.btn-next').addEventListener('click', () => {
-        nextBtnHandler()
-    })
+    }
 
     function submitBtnHandler() {
         renderAnswer(correctAnswer, parks[parkIterator++]);
-        displayAnsewr();
+        displayAnswer();
         setTimeout(() => {correctAnswer = renderQuestion(parks[parkIterator])}, wipeTransitionTime );
     }
 
     function nextBtnHandler() {
-        if (parkIterator < numberOfParks) {
+        if (parkIterator < numberOfQuestions) {
             displayQuestion();
         } else {
+            document.querySelector('.score').innerHTML = document.querySelector('.score').getAttribute('data-score');
             resultPage();
         }
     }

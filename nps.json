@@ -9533,7 +9533,7 @@
 
 ,"url":"https://www.nps.gov/hale/index.htm"
 
-,"fullName":"Haleakal&#257; National Park"			
+,"fullName":"Haleakalā National Park"			
 
 ,"parkCode":"hale"
 
@@ -9566,7 +9566,7 @@
 ,"images":[{"credit":"NPS","title":"'Ahinahina blooms in Haleakala crater","altText":"'Ahinahina blooms in Haleakala crater","caption":"'Ahinahina silversword blooms in Haleakala crater","url":"https://www.nps.gov/common/uploads/structured_data/3D05E583-1DD8-B71B-0BBFF82F7F78AF6A.jpg"},{"credit":"NPS","title":"Waimoku Waterfall","altText":"Waimoku waterfall in the park's Kipahulu District","caption":"Waimoku waterfall in the park's Kipahulu District","url":"https://www.nps.gov/common/uploads/structured_data/3D3323B6-1DD8-B71B-0B78ACA534C1D05E.jpg"},{"credit":"NPS","title":"The Pools of ?Ohe?o in the park's Kipahulu District","altText":"The Pools of ?Ohe?o in the park's Kipahulu District","caption":"The Pools of ?Ohe?o in the park's Kipahulu District","url":"https://www.nps.gov/common/uploads/structured_data/3D771172-1DD8-B71B-0B981DA08B1FE163.jpg"},{"credit":"NPS Photo","title":"Sunset Over the Crater","altText":"Sun setting over the volcano crater and horizon","caption":"The sun is setting over the volcano crater and horizon at Haleakela.","url":"https://www.nps.gov/common/uploads/structured_data/3C87A368-1DD8-B71B-0BD44B189D0D9368.jpg"}]
 ,"weatherInfo":"On any given day, the temperatures in the park can range from a high of 80°F (27°C) in Kīpahulu to a low of 30°F (-1°C) at the summit. In either area clouds and rain can quickly replace warm sunshine. Weather in the high-elevation summit and wilderness areas of the park is highly unpredictable and changes often. Cool temperatures, intense solar radiation, and rapidly moving clouds are characteristic. On average, the temperature drops about 3°F for every 1,000 foot rise in elevation."
 
-,"name":"Haleakal&#257;"
+,"name":"Haleakalā"
 
 ,"designation":"National Park"
 
@@ -18306,7 +18306,7 @@
 ,"images":[{"credit":"NPS/Rick Cain","title":"Kings Canyon","altText":"A deep canyon with a forested floor and steep granite cliffs","caption":"The Glaciers carved the Kings Canyon's steep granite cliffs, leaving a wide U-shaped valley.","url":"https://www.nps.gov/common/uploads/structured_data/3C7A250B-1DD8-B71B-0BCF61A89A8B2970.jpg"},{"credit":"NPS/Rick Cain","title":"The Tablelands","altText":"A steep granite slope leads from forest to a bare alpine landscape","caption":"Just above Lodgepole Valley, the trail to the Watchtower offers views above the treeline.","url":"https://www.nps.gov/common/uploads/structured_data/3C7A2835-1DD8-B71B-0B468E834049FBE4.jpg"},{"credit":"NPS/Paul Johnson","title":"Moro Rock","altText":"A guardrail encircles people along a narrow walkway with wide views","caption":"A historic stairway leads to the top of Moro Rock, offering views from foothills to peaks","url":"https://www.nps.gov/common/uploads/structured_data/3C7A2E1B-1DD8-B71B-0B4D563CB47FA60F.jpg"},{"credit":"NPS","title":"Giant Sequoia in Winter","altText":"A giant sequoia's reddish bark contrasts with the snow around it","caption":"For those who don't mind icy roads, winter offers stunning views of sequoias in snow.","url":"https://www.nps.gov/common/uploads/structured_data/3C7A301B-1DD8-B71B-0B8311F9B0AC4F69.jpg"},{"credit":"NPS/Rick Cain","title":"Giant Forest Museum","altText":"A rustic building is surrounded by giant sequoias","caption":"Giant Forest Museum offers exhibits, park information, and a bookstore.","url":"https://www.nps.gov/common/uploads/structured_data/3C7A4E3C-1DD8-B71B-0B99ADC8D2689BDE.jpg"}]
 ,"weatherInfo":"Because of the extreme elevation range in these parks, weather conditions vary widely between areas. In summer, the sequoia groves have comfortable temperatures and the foothills are hot and dry. Snow lingers on high-mountain passes well into summer. In fall, some areas close or reduce their hours. Winter brings snow to sequoia groves and rain to the foothills. Be prepared for tire chain requirements. Spring is a great time to hike in the foothills and snow begins to melt at higher elevations."
 
-,"name":"Sequoia & Kings Canyon"
+,"name":"Sequoia"
 
 ,"designation":"National Park"
 
@@ -18315,6 +18315,7 @@
 ,
 {
     "fullName":"Kings Canyon National Park",
+    "name": "Kings Canyon",
     "description": "Home to several giant sequoia groves and the General Grant Tree, the world's second largest measured tree, this park also features part of the Kings River, sculptor of the dramatic granite canyon that is its namesake, and the San Joaquin River, as well as Boyden Cave. Although Kings Canyon National Park was designated as such in 1940, it subsumed General Grant National Park, which had been established on October 1, 1890 as the United States' fourth national park.",
     "states":"CA",
     "designation":"National Park",
