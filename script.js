@@ -1,6 +1,4 @@
-
-
-let debug = 2; // To be fixed in next release
+let debug = 1; // To be fixed in next release
 const wipeTransitionTime = 1000*debug; // in milliseconds
 
 function getNPSData(callback) {
@@ -30,23 +28,13 @@ function generateRandomParkOrder(array) {
     return array;
 }
 
+function renderQuestion(park, img) {
 
-function renderQuestion(park) {
-
-    let img = new Image;
-
-    img.addEventListener('load', () => {
-        document.querySelector('.park-name').innerHTML = park.name;
-        document.querySelector('.park-img').src = img.src;
-        document.querySelector('.park-description').innerHTML = park.description.replace(/Alabama|Alaska|American Samoa|Arizona|Arkansa|California|Colorado|Connecticut|Delaware|District of Columbia|Federated States of Micronesia|Florida|Georgia|Guam|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Marshall Islands|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Northern Mariana Islands|Ohio|Oklahoma|Oregon|Palau|Pennsylvania|Puerto Rico|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virgin Island|Virginia|Washington|West Virginia|Wisconsin|Wyoming/ig, '_____');
-    })
-
-    let randomIndex = Math.floor(Math.random() * Object.keys(park.images).length);
-
-    img.src = park.images[randomIndex].url;
+    document.querySelector('.park-name').innerHTML = park.name;
+    document.querySelector('.park-img').src = img.src;
+    document.querySelector('.park-description').innerHTML = park.description.replace(/Alabama|Alaska|American Samoa|Arizona|Arkansa|California|Colorado|Connecticut|Delaware|District of Columbia|Federated States of Micronesia|Florida|Georgia|Guam|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Marshall Islands|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Northern Mariana Islands|Ohio|Oklahoma|Oregon|Palau|Pennsylvania|Puerto Rico|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virgin Island|Virginia|Washington|West Virginia|Wisconsin|Wyoming/ig, '_____');
 
 
-    
     return park.states;
     
 }
@@ -150,26 +138,30 @@ function gamePage(data, numberOfQuestions) {
 
     document.querySelector('.status').classList.remove('hidden');
 
-    // Reset states object in case user restarts
+    // Reset states object in case user restarts game
     for (let i in states) {
         states[i].numberOfParks = 0;
         states[i].correctParks = 0;
     }
 
     let parks = [];
-
     for (let i in data) {
         if (data[i].designation.includes("National Park")) parks.push(data[i]); 
     }
-
+    generateRandomParkOrder(parks);
     let parkIterator = 0;
+    let img = new Image;
+    img.src = parks[parkIterator].images[0].url;
+    let correctAnswer = renderQuestion(parks[parkIterator], img);
+
+    let randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator + 1].images).length);
+    img.src = parks[parkIterator + 1].images[randomIndex].url;
+
+
     document.querySelector('.question-counter').innerHTML = 1;
     document.querySelector('.question-total').innerHTML = numberOfQuestions;
     document.querySelector('.score').innerHTML = 0;
 
-    generateRandomParkOrder(parks);
-    
-    let correctAnswer = renderQuestion(parks[parkIterator]);
 
     document.querySelector('.fullscreen-container').addEventListener('click', toggleImgFullscreen);
 
@@ -220,12 +212,16 @@ function gamePage(data, numberOfQuestions) {
     function submitBtnHandler() {
         renderAnswer(correctAnswer, parks[parkIterator++]);
         displayAnswer();
-        setTimeout(() => {correctAnswer = renderQuestion(parks[parkIterator])}, wipeTransitionTime );
+        setTimeout(() => {correctAnswer = renderQuestion(parks[parkIterator], img)}, wipeTransitionTime );
     }
 
     function nextBtnHandler() {
         if (parkIterator < numberOfQuestions) {
             displayQuestion();
+            // load next image
+            randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator + 1].images).length);
+            img.src = parks[parkIterator + 1].images[randomIndex].url;
+            console.log(parks[parkIterator + 1].fullName);
         } else {
             document.querySelector('.score').innerHTML = document.querySelector('.score').getAttribute('data-score');
             resultPage();
