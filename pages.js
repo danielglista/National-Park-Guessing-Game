@@ -17,7 +17,10 @@ function renderGamePage() {
     <div class="question-mask"  style='z-index: 10;'>
         <div class="question-container crt">
             <h2 class="park-name bold italic text-center"></h2>
-            <img class='park-img' src="" alt="">
+            <div class='fullscreen-container'>
+                <img class='park-img' src="" alt="">
+                <i class="fas fa-expand fa-2x"></i>
+            </div>
             <p class="park-description"></p>
         </div>
     </div>
@@ -93,7 +96,7 @@ function renderGamePage() {
             <input class='btn btn-amber-outline btn-submit' type="button" value='Submit' />
         </div>
 
-        <input class='btn btn-green-outline btn-hint hidden' type="button" value='Hint' />
+        <input class='btn btn-green-outline btn-hint' type="button" value='Hint' />
     </div>
     `;
 

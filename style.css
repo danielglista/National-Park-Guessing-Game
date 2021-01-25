@@ -96,7 +96,33 @@ img {
     width: 100%;
     height: 216px;
     object-fit: cover;
+}
+
+img.fullscreen {
+    width: auto;
+    height: 100%;
+}
+
+.fullscreen-container {
+    display: flex;
+    justify-content: center;
+    position: relative;
     cursor: pointer;
+}
+
+.fa-expand {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transition: transform 0.1s;
+}
+
+.fa-expand:hover {
+    transform: scale(1.2);
+}
+
+.fullscreen + .fa-expand:hover {
+    transform: scale(0.8);
 }
 
 .answer-container {

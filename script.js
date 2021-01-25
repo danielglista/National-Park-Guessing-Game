@@ -171,9 +171,21 @@ function gamePage(data, numberOfQuestions) {
     
     let correctAnswer = renderQuestion(parks[parkIterator]);
 
-    document.querySelector('.park-img').addEventListener('click', () => {
-        document.querySelector('.park-img').requestFullscreen();
+    document.querySelector('.fullscreen-container').addEventListener('click', toggleImgFullscreen);
+
+    document.addEventListener('fullscreenchange', () => {
+        document.querySelector('.park-img').classList.toggle('fullscreen');
     });
+
+    function toggleImgFullscreen() {
+        if (!document.fullscreenElement) {
+            document.querySelector('.fullscreen-container').requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
 
     document.addEventListener('keyup', keyboardHandler);
 
