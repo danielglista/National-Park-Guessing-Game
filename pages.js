@@ -4,8 +4,8 @@ function renderMenuPage() {
         <h1 class='green bold text-center'>National Park Guessing Game</h1>
         <p class='green'>Test your geography knowledge of our national parks by matching national parks with the state they reside in. You will get the park name, picture, and a brief description to help aid you. I hope you have fun, and learn something new about our beautiful parks.</p>
         <div class="question-slider-container">
-            <input type='range' min='1' max='63' value='63' class='question-slider w-100' />
-            <p class="green text-center">Number of Questions: <span class='amber question-display'>63</span></p>
+            <input type='range' min='1' max='63' value='20' class='question-slider w-100' />
+            <p class="green text-center">Number of Questions: <span class='amber question-display'>20</span></p>
         </div>
         <input type='button' class='btn btn-green-outline btn-start' value='Start' />
     </div>

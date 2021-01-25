@@ -28,12 +28,25 @@ function generateRandomParkOrder(array) {
     return array;
 }
 
-function renderQuestion(park, img) {
+function renderQuestion(park, img, hint=0) {
 
-    document.querySelector('.park-name').innerHTML = park.name;
-    document.querySelector('.park-img').src = img.src;
-    document.querySelector('.park-description').innerHTML = park.description.replace(/Alabama|Alaska|American Samoa|Arizona|Arkansa|California|Colorado|Connecticut|Delaware|District of Columbia|Federated States of Micronesia|Florida|Georgia|Guam|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Marshall Islands|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Northern Mariana Islands|Ohio|Oklahoma|Oregon|Palau|Pennsylvania|Puerto Rico|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virgin Island|Virginia|Washington|West Virginia|Wisconsin|Wyoming/ig, '_____');
+    document.querySelector('.park-name').innerHTML = '???'
+    document.querySelector('.park-description').innerHTML = '???????????????????????????'
+    document.querySelector('.park-description').classList.add('text-center');
 
+
+    if (hint == 0) {
+        document.querySelector('.park-img').src = img.src;
+    }
+    if (hint > 0) {
+        document.querySelector('.park-description').classList.remove('text-center');
+        document.querySelector('.park-description').innerHTML = park.description.replace(/Alabama|Alaska|American Samoa|Arizona|Arkansa|California|Colorado|Connecticut|Delaware|District of Columbia|Federated States of Micronesia|Florida|Georgia|Guam|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Marshall Islands|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Northern Mariana Islands|Ohio|Oklahoma|Oregon|Palau|Pennsylvania|Puerto Rico|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virgin Island|Virginia|Washington|West Virginia|Wisconsin|Wyoming/ig, '_____');  
+        document.querySelector('.park-description').innerHTML = document.querySelector('.park-description').innerHTML.replace(park.name, '<span class="green">_____</span>');    
+    }
+    if (hint > 1) {
+        document.querySelector('.park-name').innerHTML = park.name;
+        document.querySelector('.park-description').innerHTML = document.querySelector('.park-description').innerHTML.replace('<span class="green">_____</span>', `<span class="green">${park.name}</span>`); 
+    }
 
     return park.states;
     
@@ -151,10 +164,12 @@ function gamePage(data, numberOfQuestions) {
     generateRandomParkOrder(parks);
     let parkIterator = 0;
     let img = new Image;
-    img.src = parks[parkIterator].images[0].url;
+    let randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator].images).length);
+    img.src = parks[parkIterator].images[randomIndex].url;
     let correctAnswer = renderQuestion(parks[parkIterator], img);
+    let hint = 0;
 
-    let randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator + 1].images).length);
+    randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator + 1].images).length);
     img.src = parks[parkIterator + 1].images[randomIndex].url;
 
 
@@ -197,6 +212,8 @@ function gamePage(data, numberOfQuestions) {
         e.preventDefault();
     });
 
+    document.querySelector('.btn-hint').addEventListener('click', hintHander);
+
     function keyboardHandler(e) {
         if (e.key == 'Enter') {
             if (document.querySelector('.question-mask').style.zIndex == 10 && !document.querySelector('.btn-submit').classList.contains('disabled')) {
@@ -212,6 +229,8 @@ function gamePage(data, numberOfQuestions) {
     function submitBtnHandler() {
         renderAnswer(correctAnswer, parks[parkIterator++]);
         displayAnswer();
+        hint = 0;
+        document.querySelector('.btn-hint').classList.remove('disabled');
         setTimeout(() => {correctAnswer = renderQuestion(parks[parkIterator], img)}, wipeTransitionTime );
     }
 
@@ -228,6 +247,12 @@ function gamePage(data, numberOfQuestions) {
         }
     }
 
+    function hintHander() {
+        renderQuestion(parks[parkIterator], img, ++hint);
+        if (hint > 1) {
+            document.querySelector('.btn-hint').classList.add('disabled');
+        }
+    }
 }
 
 function resultPage() {

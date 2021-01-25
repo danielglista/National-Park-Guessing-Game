@@ -90,6 +90,7 @@ body {
     background-color: var(--black);
     position: relative;
     width: calc(100vw - 2rem);
+    height: 500px;
 }
 
 img {
