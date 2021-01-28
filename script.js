@@ -250,15 +250,28 @@ function gamePage(data, numberOfQuestions) {
 
     document.querySelector('.svg-container').onwheel = function(e) {
         e.preventDefault();
+
+
+
         var w = viewBox.w;
         var h = viewBox.h;
         var mx = e.offsetX;//mouse x  
-        var my = e.offsetY;    
-        var dw = w*Math.sign(-e.deltaY)*0.04;
-        var dh = h*Math.sign(-e.deltaY)*0.04;
-        var dx = dw*mx/svgSize.w;
-        var dy = dh*my/svgSize.h;
+        var my = e.offsetY;  
+        if (((viewBox.w >= 1452 || viewBox.h >= 870 ) && e.deltaY > 0) || ((viewBox.w <= 332 || viewBox.h <= 200 ) && e.deltaY < 0) ) {
+            var dx = 0;
+            var dy = 0;
+            var dw = 0;
+            var dh = 0;
+        } else { 
+            var dw = w*Math.sign(-e.deltaY)*0.04;
+            var dh = h*Math.sign(-e.deltaY)*0.04;
+            var dx = dw*mx/svgSize.w;
+            var dy = dh*my/svgSize.h;
+        }
         viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
+     
+        console.log(viewBox)
+
         scale = svgSize.w/viewBox.w;
         svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
     }
