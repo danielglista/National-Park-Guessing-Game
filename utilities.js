@@ -122,3 +122,38 @@ stateNameList = {
     WI: 'Wisconsin',
     WY: 'Wyoming' 
 }
+
+parkLocations = {
+    "Lake Clark": {
+        "x": "38%",
+        "y": "67%"
+    },
+    "Glacier Bay": {
+        "x": "81%",
+        "y": "74%"
+    },
+    "Katmai": {
+        "x": "37%",
+        "y": "74%"
+    },
+    "Kenai Fjords": {
+        "x": "49%",
+        "y": "69%"
+    },
+    "Wrangell–St. Elias": {
+        "x": "65%",
+        "y": "58%"
+    },
+    "Denali": {
+        "x": "46%",
+        "y": "53%"
+    },
+    "Gates of the Arctic": {
+        "x": "38%",
+        "y": "25%"
+    },
+    "Kobuk Valley": {
+        "x": "27%",
+        "y": "28%"
+    }
+}

@@ -29,7 +29,15 @@ function renderGamePage() {
         <div class='answer-container green crt'>
             <i class="far fa-9x"></i>
             <h1></h1>
-            <p class='state-answer'></p>
+            <p class='state-answer'></p> 
+            <div class='svg-container'>
+                <svg viewbox= '0 0 1452 870'>
+                    <image href="/images/usa.png" style='width: 1452px'; height: '870px'; />
+                </svg>
+            </div>
+            <div class='model'>test</div>
+            
+            
             <input class='btn btn-next disabled' type='button' value='Next' />
         </div>
     </div>
