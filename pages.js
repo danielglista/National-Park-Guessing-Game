@@ -21,13 +21,15 @@ function renderGamePage() {
                 <img class='park-img' src="" alt="">
                 <i class="fas fa-expand fa-2x"></i>
             </div>
-            <p class="park-description"></p>
+            <div class='park-description-container'>
+                <p class="park-description"></p>
+            </div>
         </div>
     </div>
 
     <div class="answer-mask" style='z-index: 5;'>
         <div class='answer-container green crt'>
-            <i class="far fa-9x"></i>
+           <i class="far fa-9x"></i>
             <h1></h1>
             <p class='state-answer'></p> 
             <div class='svg-container'>

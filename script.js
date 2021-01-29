@@ -32,18 +32,20 @@ function renderQuestion(park, img, hint=0) {
 
     document.querySelector('.park-name').innerHTML = '???'
     document.querySelector('.park-description').innerHTML = '???????????????????????????'
-    document.querySelector('.park-description').classList.add('text-center');
+    document.querySelector('.park-description').classList.add('text-center', 'green');
 
 
     if (hint == 0) {
         document.querySelector('.park-img').src = img.src;
     }
     if (hint > 0) {
-        document.querySelector('.park-description').classList.remove('text-center');
+        document.querySelector('.park-name').classList.add('green');
+        document.querySelector('.park-description').classList.remove('text-center', 'green');
         document.querySelector('.park-description').innerHTML = park.description.replaceAll(/Alabama|Alaska|American Samoa|Arizona|Arkansa|California|Colorado|Connecticut|Delaware|District of Columbia|Federated States of Micronesia|Florida|Georgia|Guam|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Marshall Islands|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Northern Mariana Islands|Ohio|Oklahoma|Oregon|Palau|Pennsylvania|Puerto Rico|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virgin Island|Virginia|Washington|West Virginia|Wisconsin|Wyoming/ig, '_____');  
         document.querySelector('.park-description').innerHTML = document.querySelector('.park-description').innerHTML.replaceAll(park.name, '<span class="green">_____</span>');    
     }
     if (hint > 1) {
+        document.querySelector('.park-name').classList.remove('green');
         document.querySelector('.park-name').innerHTML = park.name;
         document.querySelector('.park-description').innerHTML = document.querySelector('.park-description').innerHTML.replaceAll('<span class="green">_____</span>', `<span class="green">${park.name}</span>`); 
     }
@@ -75,12 +77,17 @@ function displayQuestion() {
 function lonLatToXY(longitude, latitude) {
     let west = -124.73;
     let east = -66.57;
+    let south = 24.544233;
+    let north = 49.384422;
     let width = 1452;
-    longitude = -68.247501;
-    console.log((width) * Math.abs(longitude - west) / Math.abs(west - east))
+    let height = 796;
+    // longitude = -103.190020
+    // latitude = 37
+    // console.log((width) * Math.abs(longitude - west) / Math.abs(west - east))
     // let x = ((longitude - east) / (west - east)) * width;
     x = (width) * (longitude - west) / Math.abs(west - east);
-    return [x, 300];
+    y = (height) * Math.abs(latitude - north) / Math.abs(north - south);
+    return {x:x, y:y};
 }
 
 function renderAnswer(correctAnswer, park) {
@@ -123,7 +130,7 @@ function renderAnswer(correctAnswer, park) {
     //states[correctStates[0]].parks.push(parkLocations['Lake Clark']);
 
     let cord = lonLatToXY(0, 0);
-    document.querySelector('svg').innerHTML += `<circle cx='${cord[0]}px' cy='50%' r='10' stroke='green' stroke-width='5' fill='none' fill-opacity='0.01' </circle>`
+    // document.querySelector('svg').innerHTML += `<circle cx='${cord.x}px' cy='${cord.y}' r='10' stroke='green' stroke-width='5' fill='none' fill-opacity='0.01' </circle>`
 
 
 }
@@ -180,6 +187,12 @@ function gamePage(data, numberOfQuestions) {
     for (let i in data) {
         if (data[i].designation.includes("National Park")) parks.push(data[i]); 
     }
+
+    // for (let i in parks) {
+    //     if (parks[i].states == 'HI' || parks[i].states == 'AK' || parks[i].states == 'AS' || parks[i].states == 'VI') continue;
+    //     let cord = lonLatToXY(parks[i].longitude, parks[i].latitude)
+    //     document.querySelector('svg').innerHTML += `<circle cx='${cord.x}px' cy='${cord.y+25}' r='8' fill='#33ff00' </circle>`
+    // }
 
 
     generateRandomParkOrder(parks);
@@ -243,10 +256,20 @@ function gamePage(data, numberOfQuestions) {
     svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
     const svgSize = {w:svgImage.clientWidth,h:svgImage.clientHeight};
     var isPanning = false;
+    let isZomming = false;
     var startPoint = {x:0,y:0};
-    var endPoint = {x:0,y:0};;
+    var endPoint = {x:0,y:0};
     var scale = 1;
-    let lastTouch = {x:0,y:0};
+    let startPoint2 = {x:0,y:0};
+    let endPoint2 = {x:0,y:0}
+    let rect = svgImage.getBoundingClientRect();
+    
+    let startX = 0;
+    let startY = 0;
+
+    document.querySelector('.text-input').addEventListener('blur', () => {
+        window.scrollTo(0, 0);
+    })
 
     document.querySelector('.svg-container').onwheel = function(e) {
         e.preventDefault();
@@ -265,14 +288,12 @@ function gamePage(data, numberOfQuestions) {
         } else { 
             var dw = w*Math.sign(-e.deltaY)*0.04;
             var dh = h*Math.sign(-e.deltaY)*0.04;
+            console.log(mx)
             var dx = dw*mx/svgSize.w;
             var dy = dh*my/svgSize.h;
         }
-        viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
-     
-        console.log(viewBox)
-
         scale = svgSize.w/viewBox.w;
+        viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
         svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
     }
 
@@ -280,12 +301,29 @@ function gamePage(data, numberOfQuestions) {
 
     svgContainer.onmousedown = function(e){
         isPanning = true;
-        startPoint = {x:e.x,y:e.y};   
+        startPoint = {x:e.x,y:e.y};  
+        console.log(svgImage.offsetY)
     }
 
     svgContainer.ontouchstart = function(e){
+        e.preventDefault();
+        
+
+
+
         isPanning = true;
-        startPoint = {x:e.touches[0].screenX,y:e.touches[0].screenY};   
+        startPoint = {x:e.touches[0].screenX - rect.left ,y:e.touches[0].screenY - 242};   
+        document.querySelector('.state-answer').innerHTML = startPoint.x + ', ' + startPoint.y + ', ' + rect.top;
+
+        if (e.touches[1]) {
+            startPoint2 = {x:e.touches[1].screenX - rect.left,y:e.touches[1].screenY - 242}
+            isZomming = true;
+
+            startX = (startPoint.x + startPoint2.x ) / 2
+            
+            startY = (startPoint.y + startPoint2.y ) / 2
+           
+        }
     }
     
     svgContainer.onmousemove = function(e){
@@ -300,11 +338,40 @@ function gamePage(data, numberOfQuestions) {
 
     svgContainer.ontouchmove = function(e){
         if (isPanning){
-            endPoint = {x:e.touches[0].screenX,y:e.touches[0].screenY};
+            endPoint = {x:e.touches[0].screenX - rect.left,y:e.touches[0].screenY - 242};
             var dx = (startPoint.x - endPoint.x)/scale;
             var dy = (startPoint.y - endPoint.y)/scale;
             var movedViewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
             svgImage.setAttribute('viewBox', `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`);
+        }
+        if (isZomming) {
+            endPoint = {x:e.touches[0].screenX - rect.left,y:e.touches[0].screenY - 242};
+            endPoint2 = {x:e.touches[1].screenX - rect.left,y:e.touches[1].screenY - 242};
+            let startDistance = Math.sqrt(Math.pow(startPoint.x - startPoint2.x, 2) + Math.pow(startPoint.y - startPoint2.y, 2));
+            let endDistance =  Math.sqrt(Math.pow(endPoint.x - endPoint2.x, 2) + Math.pow(endPoint.y - endPoint2.y, 2));
+            let delta = endDistance / startDistance - 1;
+
+            
+
+            startPoint.x = endPoint.x;
+            startPoint.y = endPoint.y;
+            startPoint2.x = endPoint2.x;
+            startPoint2.y = endPoint2.y;
+
+            var w = viewBox.w;
+            var h = viewBox.h;
+
+            var dw = w*delta;
+            var dh = h*delta;
+
+
+            var dx = dw*startX/svgSize.w;
+            var dy = dh*startY/svgSize.h;
+            scale = svgSize.w/viewBox.w;
+            viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
+            svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+
+
         }
     }
     
@@ -326,6 +393,9 @@ function gamePage(data, numberOfQuestions) {
             viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
             svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
             isPanning = false;
+        }
+        if (isZomming) {
+            isZomming = false;
         }
     }
     
