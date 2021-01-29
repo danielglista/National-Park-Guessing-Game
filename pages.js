@@ -36,8 +36,10 @@ function renderGamePage() {
                 <svg viewbox= '0 0 1452 870'>
                     <image href="/images/usa.png" style='width: 1452px'; height: '870px'; />
                 </svg>
+                <p class='tooltip'>TEST</p>
             </div>
             <div class='model'>test</div>
+            
             
             
             <input class='btn btn-next disabled' type='button' value='Next' />

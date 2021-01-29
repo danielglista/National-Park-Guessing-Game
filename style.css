@@ -152,6 +152,7 @@ img.fullscreen {
 
 .svg-container {
     margin: 1rem 0;
+    position: relative;
 }
 
 svg {
@@ -162,6 +163,18 @@ svg {
 
 circle:hover {
     r: 12px;
+}
+
+.tooltip {
+    font-size: 0.8rem;
+    position: absolute;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--amber);
+    color: var(--amber);
+    background: var(--black);
+    top: 0;
+    left: 0;
+    visibility: hidden;
 }
 
 .buttons-container {

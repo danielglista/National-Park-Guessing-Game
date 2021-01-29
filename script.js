@@ -90,9 +90,37 @@ function lonLatToXY(longitude, latitude) {
     return {x:x, y:y};
 }
 
+function showTooltip(e) {
+    let element = e.srcElement;
+    let tooltip = document.querySelector('.tooltip')
+    tooltip.innerHTML = element.getAttribute('parkname');
+    let tooltipRect = tooltip.getBoundingClientRect();
+    // document.querySelector('.tooltip').style.top = e.offsetY - 50 + 'px';
+    // document.querySelector('.tooltip').style.left = e.offsetX - ((tooltipRect.right - tooltipRect.left) / 2) + 'px';
+    tooltip.style.visibility = 'visible';
+}
+
+function showTooltipTouch(element) {
+
+    let tooltip = document.querySelector('.tooltip')
+    tooltip.innerHTML = element.getAttribute('parkname');
+    let tooltipRect = tooltip.getBoundingClientRect();
+    tooltip.style.left = element.getBoundingClientRect().left + ((tooltipRect.right - tooltipRect.left) / 2) + 'px';
+    tooltip.style.top =  element.getBoundingClientRect().top - document.querySelector('svg').getBoundingClientRect().top - 25 + 'px';
+    document.querySelector('.state-answer').innerHTML =element.getBoundingClientRect().width;
+    tooltip.style.visibility = 'visible';
+}
+
+function hideTooltip() {
+    document.querySelector('.tooltip').style.visibility = 'hidden';
+}
+
+
+
 function renderAnswer(correctAnswer, park) {
     const userAnswer = getStateTwoDigitCode(document.querySelector('.text-input').value);
     let correctStates = correctAnswer.split(',');
+    let cord = lonLatToXY(park.longitude, park.latitude);
 
     if (correctAnswer.includes(userAnswer)) {
         document.querySelector('.answer-container').className = document.querySelector('.answer-container').className.replace('red', 'green');
@@ -105,6 +133,7 @@ function renderAnswer(correctAnswer, park) {
             states[i].numberOfParks++;
             states[i].correctParks++;
         }
+        document.querySelector('svg').innerHTML += `<circle cx='${cord.x}px' cy='${cord.y}' r='15' fill='#33ff00' </circle>`
     } else {
         document.querySelector('.answer-container').className = document.querySelector('.answer-container').className.replace('green', 'red');
         document.querySelector('.answer-container i').className = 'fas fa-times fa-9x';
@@ -114,6 +143,7 @@ function renderAnswer(correctAnswer, park) {
         for (let i of correctStates) {
             states[i].numberOfParks++;
         }
+        document.querySelector('svg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y + 25}' r='15' fill='#ff4000' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltipTouch(this)' ontouchend='hideTooltip()'> </circle>`
     }
 
  
@@ -127,10 +157,9 @@ function renderAnswer(correctAnswer, park) {
 
     document.querySelector('.state-answer').innerHTML = stateNamesString + ' - ' + park.name;
 
-    //states[correctStates[0]].parks.push(parkLocations['Lake Clark']);
+   // map['correctParks'].push(park)
 
-    let cord = lonLatToXY(0, 0);
-    // document.querySelector('svg').innerHTML += `<circle cx='${cord.x}px' cy='${cord.y}' r='10' stroke='green' stroke-width='5' fill='none' fill-opacity='0.01' </circle>`
+
 
 
 }
@@ -288,7 +317,6 @@ function gamePage(data, numberOfQuestions) {
         } else { 
             var dw = w*Math.sign(-e.deltaY)*0.04;
             var dh = h*Math.sign(-e.deltaY)*0.04;
-            console.log(mx)
             var dx = dw*mx/svgSize.w;
             var dy = dh*my/svgSize.h;
         }
@@ -302,7 +330,6 @@ function gamePage(data, numberOfQuestions) {
     svgContainer.onmousedown = function(e){
         isPanning = true;
         startPoint = {x:e.x,y:e.y};  
-        console.log(svgImage.offsetY)
     }
 
     svgContainer.ontouchstart = function(e){
@@ -313,7 +340,7 @@ function gamePage(data, numberOfQuestions) {
 
         isPanning = true;
         startPoint = {x:e.touches[0].screenX - rect.left ,y:e.touches[0].screenY - 242};   
-        document.querySelector('.state-answer').innerHTML = startPoint.x + ', ' + startPoint.y + ', ' + rect.top;
+        
 
         if (e.touches[1]) {
             startPoint2 = {x:e.touches[1].screenX - rect.left,y:e.touches[1].screenY - 242}
@@ -334,6 +361,11 @@ function gamePage(data, numberOfQuestions) {
             var movedViewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
             svgImage.setAttribute('viewBox', `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`);
         }
+
+        let tooltip = document.querySelector('.tooltip')
+        let tooltipRect = tooltip.getBoundingClientRect();
+        document.querySelector('.tooltip').style.left = e.pageX - rect.left - ((tooltipRect.right - tooltipRect.left) / 2) + 'px';
+        document.querySelector('.tooltip').style.top = e.pageY - 242 + 'px';
     }
 
     svgContainer.ontouchmove = function(e){
@@ -388,18 +420,22 @@ function gamePage(data, numberOfQuestions) {
 
     svgContainer.ontouchend = function(e){
         if (isPanning){ 
-            var dx = (startPoint.x - endPoint.x)/scale;
-            var dy = (startPoint.y - endPoint.y)/scale;
-            viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
-            svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+            if (!endPoint.x == 0 && !endPoint.y == 0) {
+                var dx = (startPoint.x - endPoint.x)/scale;
+                var dy = (startPoint.y - endPoint.y)/scale;
+                viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
+                svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+            }
             isPanning = false;
+            endPoint.x = 0;
+            endPoint.y = 0;
         }
         if (isZomming) {
             isZomming = false;
         }
     }
     
-        svgContainer.onmouseleave = function(e){
+    svgContainer.onmouseleave = function(e){
         isPanning = false;
     }
 
@@ -456,58 +492,64 @@ function resultPage() {
 menuPage();
 
 states = {
-    AZ: {numberOfParks: 0, correctParks: 0, parks: {}},
-    AL: {numberOfParks: 0, correctParks: 0, parks: {}},
-    AK: {numberOfParks: 0, correctParks: 0, parks: {}},
-    AS: {numberOfParks: 0, correctParks: 0, parks: {}},
-    AR: {numberOfParks: 0, correctParks: 0, parks: {}},
-    CA: {numberOfParks: 0, correctParks: 0, parks: {}},
-    CO: {numberOfParks: 0, correctParks: 0, parks: {}},
-    CT: {numberOfParks: 0, correctParks: 0, parks: {}},
-    DC: {numberOfParks: 0, correctParks: 0, parks: {}},
-    DE: {numberOfParks: 0, correctParks: 0, parks: {}},
-    FL: {numberOfParks: 0, correctParks: 0, parks: {}},
-    GA: {numberOfParks: 0, correctParks: 0, parks: {}},
-    HI: {numberOfParks: 0, correctParks: 0, parks: {}},
-    ID: {numberOfParks: 0, correctParks: 0, parks: {}},
-    IL: {numberOfParks: 0, correctParks: 0, parks: {}},
-    IN: {numberOfParks: 0, correctParks: 0, parks: {}},
-    IA: {numberOfParks: 0, correctParks: 0, parks: {}},
-    KS: {numberOfParks: 0, correctParks: 0, parks: {}},
-    KY: {numberOfParks: 0, correctParks: 0, parks: {}},
-    LA: {numberOfParks: 0, correctParks: 0, parks: {}},
-    ME: {numberOfParks: 0, correctParks: 0, parks: {}},
-    MD: {numberOfParks: 0, correctParks: 0, parks: {}},
-    MA: {numberOfParks: 0, correctParks: 0, parks: {}},
-    MI: {numberOfParks: 0, correctParks: 0, parks: {}},
-    MN: {numberOfParks: 0, correctParks: 0, parks: {}},
-    MS: {numberOfParks: 0, correctParks: 0, parks: {}},
-    MO: {numberOfParks: 0, correctParks: 0, parks: {}},
-    MT: {numberOfParks: 0, correctParks: 0, parks: {}},
-    NE: {numberOfParks: 0, correctParks: 0, parks: {}},
-    NV: {numberOfParks: 0, correctParks: 0, parks: {}},
-    NH: {numberOfParks: 0, correctParks: 0, parks: {}},
-    NJ: {numberOfParks: 0, correctParks: 0, parks: {}},
-    NM: {numberOfParks: 0, correctParks: 0, parks: {}},
-    NY: {numberOfParks: 0, correctParks: 0, parks: {}},
-    NC: {numberOfParks: 0, correctParks: 0, parks: {}},
-    ND: {numberOfParks: 0, correctParks: 0, parks: {}},
-    OH: {numberOfParks: 0, correctParks: 0, parks: {}},
-    OK: {numberOfParks: 0, correctParks: 0, parks: {}},
-    OR: {numberOfParks: 0, correctParks: 0, parks: {}},
-    PA: {numberOfParks: 0, correctParks: 0, parks: {}},
-    RI: {numberOfParks: 0, correctParks: 0, parks: {}},
-    SC: {numberOfParks: 0, correctParks: 0, parks: {}},
-    SD: {numberOfParks: 0, correctParks: 0, parks: {}},
-    TN: {numberOfParks: 0, correctParks: 0, parks: {}},
-    TX: {numberOfParks: 0, correctParks: 0, parks: {}},
-    UT: {numberOfParks: 0, correctParks: 0, parks: {}},
-    VT: {numberOfParks: 0, correctParks: 0, parks: {}},
-    VI: {numberOfParks: 0, correctParks: 0, parks: {}},
-    VA: {numberOfParks: 0, correctParks: 0, parks: {}},
-    WA: {numberOfParks: 0, correctParks: 0, parks: {}},
-    WV: {numberOfParks: 0, correctParks: 0, parks: {}},
-    WI: {numberOfParks: 0, correctParks: 0, parks: {}},
-    WY: {numberOfParks: 0, correctParks: 0, parks: {}} 
+    AZ: {numberOfParks: 0, correctParks: 0},
+    AL: {numberOfParks: 0, correctParks: 0},
+    AK: {numberOfParks: 0, correctParks: 0},
+    AS: {numberOfParks: 0, correctParks: 0},
+    AR: {numberOfParks: 0, correctParks: 0},
+    CA: {numberOfParks: 0, correctParks: 0},
+    CO: {numberOfParks: 0, correctParks: 0},
+    CT: {numberOfParks: 0, correctParks: 0},
+    DC: {numberOfParks: 0, correctParks: 0},
+    DE: {numberOfParks: 0, correctParks: 0},
+    FL: {numberOfParks: 0, correctParks: 0},
+    GA: {numberOfParks: 0, correctParks: 0},
+    HI: {numberOfParks: 0, correctParks: 0},
+    ID: {numberOfParks: 0, correctParks: 0},
+    IL: {numberOfParks: 0, correctParks: 0},
+    IN: {numberOfParks: 0, correctParks: 0},
+    IA: {numberOfParks: 0, correctParks: 0},
+    KS: {numberOfParks: 0, correctParks: 0},
+    KY: {numberOfParks: 0, correctParks: 0},
+    LA: {numberOfParks: 0, correctParks: 0},
+    ME: {numberOfParks: 0, correctParks: 0},
+    MD: {numberOfParks: 0, correctParks: 0},
+    MA: {numberOfParks: 0, correctParks: 0},
+    MI: {numberOfParks: 0, correctParks: 0},
+    MN: {numberOfParks: 0, correctParks: 0},
+    MS: {numberOfParks: 0, correctParks: 0},
+    MO: {numberOfParks: 0, correctParks: 0},
+    MT: {numberOfParks: 0, correctParks: 0},
+    NE: {numberOfParks: 0, correctParks: 0},
+    NV: {numberOfParks: 0, correctParks: 0},
+    NH: {numberOfParks: 0, correctParks: 0},
+    NJ: {numberOfParks: 0, correctParks: 0},
+    NM: {numberOfParks: 0, correctParks: 0},
+    NY: {numberOfParks: 0, correctParks: 0},
+    NC: {numberOfParks: 0, correctParks: 0},
+    ND: {numberOfParks: 0, correctParks: 0},
+    OH: {numberOfParks: 0, correctParks: 0},
+    OK: {numberOfParks: 0, correctParks: 0},
+    OR: {numberOfParks: 0, correctParks: 0},
+    PA: {numberOfParks: 0, correctParks: 0},
+    RI: {numberOfParks: 0, correctParks: 0},
+    SC: {numberOfParks: 0, correctParks: 0},
+    SD: {numberOfParks: 0, correctParks: 0},
+    TN: {numberOfParks: 0, correctParks: 0},
+    TX: {numberOfParks: 0, correctParks: 0},
+    UT: {numberOfParks: 0, correctParks: 0},
+    VT: {numberOfParks: 0, correctParks: 0},
+    VI: {numberOfParks: 0, correctParks: 0},
+    VA: {numberOfParks: 0, correctParks: 0},
+    WA: {numberOfParks: 0, correctParks: 0},
+    WV: {numberOfParks: 0, correctParks: 0},
+    WI: {numberOfParks: 0, correctParks: 0},
+    WY: {numberOfParks: 0, correctParks: 0} 
 }
+
+map = {
+    correctParks: [],
+    wrongParks: []
+}
+
 
