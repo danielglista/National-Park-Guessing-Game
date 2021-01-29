@@ -94,20 +94,6 @@ function showTooltip(e) {
     let element = e.srcElement;
     let tooltip = document.querySelector('.tooltip')
     tooltip.innerHTML = element.getAttribute('parkname');
-    let tooltipRect = tooltip.getBoundingClientRect();
-    // document.querySelector('.tooltip').style.top = e.offsetY - 50 + 'px';
-    // document.querySelector('.tooltip').style.left = e.offsetX - ((tooltipRect.right - tooltipRect.left) / 2) + 'px';
-    tooltip.style.visibility = 'visible';
-}
-
-function showTooltipTouch(element) {
-
-    let tooltip = document.querySelector('.tooltip')
-    tooltip.innerHTML = element.getAttribute('parkname');
-    let tooltipRect = tooltip.getBoundingClientRect();
-    tooltip.style.left = element.getBoundingClientRect().left + ((tooltipRect.right - tooltipRect.left) / 2) + 'px';
-    tooltip.style.top =  element.getBoundingClientRect().top - document.querySelector('svg').getBoundingClientRect().top - 25 + 'px';
-    document.querySelector('.state-answer').innerHTML =element.getBoundingClientRect().width;
     tooltip.style.visibility = 'visible';
 }
 
@@ -133,7 +119,7 @@ function renderAnswer(correctAnswer, park) {
             states[i].numberOfParks++;
             states[i].correctParks++;
         }
-        document.querySelector('svg').innerHTML += `<circle cx='${cord.x}px' cy='${cord.y}' r='15' fill='#33ff00' </circle>`
+        document.querySelector('svg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y + 25}' r='15' fill='#33ff00' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
     } else {
         document.querySelector('.answer-container').className = document.querySelector('.answer-container').className.replace('green', 'red');
         document.querySelector('.answer-container i').className = 'fas fa-times fa-9x';
@@ -143,7 +129,7 @@ function renderAnswer(correctAnswer, park) {
         for (let i of correctStates) {
             states[i].numberOfParks++;
         }
-        document.querySelector('svg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y + 25}' r='15' fill='#ff4000' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltipTouch(this)' ontouchend='hideTooltip()'> </circle>`
+        document.querySelector('svg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y + 25}' r='15' fill='#ff4000' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
     }
 
  
@@ -309,6 +295,7 @@ function gamePage(data, numberOfQuestions) {
         var h = viewBox.h;
         var mx = e.offsetX;//mouse x  
         var my = e.offsetY;  
+        scale = svgSize.w/viewBox.w;
         if (((viewBox.w >= 1452 || viewBox.h >= 870 ) && e.deltaY > 0) || ((viewBox.w <= 332 || viewBox.h <= 200 ) && e.deltaY < 0) ) {
             var dx = 0;
             var dy = 0;
@@ -319,8 +306,13 @@ function gamePage(data, numberOfQuestions) {
             var dh = h*Math.sign(-e.deltaY)*0.04;
             var dx = dw*mx/svgSize.w;
             var dy = dh*my/svgSize.h;
+ 
         }
-        scale = svgSize.w/viewBox.w;
+        console.log(scale)
+        document.querySelectorAll('circle').forEach( (circle) => {
+            circle.setAttribute('r', ((viewBox.w - 332) / (1452 - 332) * 17) + 8) 
+        })
+
         viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
         svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
     }
@@ -351,6 +343,11 @@ function gamePage(data, numberOfQuestions) {
             startY = (startPoint.y + startPoint2.y ) / 2
            
         }
+
+        let tooltip = document.querySelector('.tooltip')
+        let tooltipRect = tooltip.getBoundingClientRect();
+        document.querySelector('.tooltip').style.left = e.touches[0].screenX - rect.left - ((tooltipRect.right - tooltipRect.left) / 2) + 'px';
+        document.querySelector('.tooltip').style.top = e.touches[0].screenY - 242 - 75 + 'px';
     }
     
     svgContainer.onmousemove = function(e){
@@ -405,6 +402,8 @@ function gamePage(data, numberOfQuestions) {
 
 
         }
+
+        
     }
     
     svgContainer.onmouseup = function(e){

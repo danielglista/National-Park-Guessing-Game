@@ -162,8 +162,9 @@ svg {
 }
 
 circle:hover {
-    r: 12px;
+    r: 20px;
 }
+
 
 .tooltip {
     font-size: 0.8rem;
