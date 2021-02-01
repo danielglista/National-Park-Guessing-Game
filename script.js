@@ -1,6 +1,6 @@
 let debug = 0.8; // To be fixed in next release
 const wipeTransitionTime = 1000*debug; // in milliseconds
-let viewBox = {x:0,y:0,w:0,h:0}; // to be moved into gamePage.js
+let viewBox = {x:0,y:0,w:1179,h:1329}; // to be moved into gamePage.js
 const maxWidth = 951;
 const minWidth = 48;
 const maxHeight = 1000;
@@ -84,7 +84,7 @@ function lonLatToXY(longitude, latitude) {
     let eastBoundry = -52.631621;
     let southBoundry = 18.910765;
     let northBoundry = 83.090765;
-    let width = 1264//3624;
+    let width = 1179//3624;
     let height = 1329//3727;
     let mapLonDelta = eastBoundry - westBoundry;
     let x = (longitude - westBoundry) * (width/mapLonDelta)
@@ -95,7 +95,7 @@ function lonLatToXY(longitude, latitude) {
     let worldMapWidth = ((width / mapLonDelta) * 360) / (2 * Math.PI);
     let mapOffsetY = (worldMapWidth / 2 * Math.log((1 + Math.sin(mapLatBottomDegree)) / (1 - Math.sin(mapLatBottomDegree))));
     let y = height - ((worldMapWidth / 2 * Math.log((1 + Math.sin(latitude)) / (1 - Math.sin(latitude)))) - mapOffsetY);
-    y += 90;
+    y += 0;
 
     return {x:x, y:y};
 }
@@ -125,12 +125,13 @@ function renderAnswer(correctAnswer, park) {
         stateNamesString += getStateFullName(correctStates[i]);
     }
     let cord = lonLatToXY(park.longitude, park.latitude);
-    viewBox = {x:states[correctStates[0]].viewBox.x, y:states[correctStates[0]].viewBox.y, w:states[correctStates[0]].viewBox.w, h:states[correctStates[0]].viewBox.h};
-    document.querySelector('svg').setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`)
+    document.querySelector('.answer-container .btn-next').classList.remove('hidden');
+    //viewBox = {x:states[correctStates[0]].viewBox.x, y:states[correctStates[0]].viewBox.y, w:states[correctStates[0]].viewBox.w, h:states[correctStates[0]].viewBox.h};
+    //document.querySelector('svg').setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`)
 
     if (correctAnswer.includes(userAnswer)) {
         document.querySelector('.answer-container').className = document.querySelector('.answer-container').className.replace('red', 'green');
-        document.querySelector('.answer-container i').className = 'fas fa-check fa-9x';
+        // document.querySelector('.answer-container i').className = 'fas fa-check fa-9x';
         document.querySelector('.answer-container h1').innerHTML = '+1';
         document.querySelector('.answer-container input').classList.add('btn-green-outline');
         document.querySelector('.answer-container input').classList.remove('btn-red-outline');
@@ -141,7 +142,7 @@ function renderAnswer(correctAnswer, park) {
         document.querySelector('svg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y}' r='15' fill='#33ff00' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
     } else {
         document.querySelector('.answer-container').className = document.querySelector('.answer-container').className.replace('green', 'red');
-        document.querySelector('.answer-container i').className = 'fas fa-times fa-9x';
+        // document.querySelector('.answer-container i').className = 'fas fa-times fa-9x';
         document.querySelector('.answer-container h1').innerHTML = '';
         document.querySelector('.answer-container input').classList.add('btn-red-outline');
         document.querySelector('.answer-container input').classList.remove('btn-green-outline');
@@ -186,6 +187,11 @@ function menuPage() {
     });
 }
 
+function pathClickHandler(path) {
+    document.querySelector('.text-input').value = path.getAttribute('title');
+}
+
+
 function gamePage(data, numberOfQuestions) {
 
     document.querySelector('.card').innerHTML = renderGamePage();
@@ -203,13 +209,6 @@ function gamePage(data, numberOfQuestions) {
         if (data[i].designation.includes("National Park")) parks.push(data[i]); 
     }
 
-    // for (let i in parks) {
-    //     if (parks[i].states == 'HI' || parks[i].states == 'AK' || parks[i].states == 'AS' || parks[i].states == 'VI') continue;
-    //     let cord = lonLatToXY(parks[i].longitude, parks[i].latitude)
-    //     document.querySelector('svg').innerHTML += `<circle cx='${cord.x}px' cy='${cord.y+25}' r='8' fill='#33ff00' </circle>`
-    // }
-
-
     generateRandomParkOrder(parks);
     let parkIterator = 0;
     let img = new Image;
@@ -226,6 +225,11 @@ function gamePage(data, numberOfQuestions) {
     document.querySelector('.question-total').innerHTML = numberOfQuestions;
     document.querySelector('.score').innerHTML = 0;
 
+
+    document.querySelectorAll('.state-paths > *').forEach( (path) => {
+        path.setAttribute('onclick', "pathClickHandler(this)");
+        path.setAttribute('ontouchstart', "pathClickHandler(this)");
+    })
 
     document.querySelector('.fullscreen-container').addEventListener('click', toggleImgFullscreen);
 
@@ -274,10 +278,11 @@ function gamePage(data, numberOfQuestions) {
     let isZomming = false;
     var startPoint = {x:0,y:0};
     var endPoint = {x:0,y:0};
-    var scale = 1;
+    var scale =  svgSize.w/viewBox.w;
     let startPoint2 = {x:0,y:0};
     let endPoint2 = {x:0,y:0}
     let svgRect = svgImage.getBoundingClientRect();
+    let panningCoeficient = 2;
     
     let startX = 0;
     let startY = 0;
@@ -288,14 +293,13 @@ function gamePage(data, numberOfQuestions) {
 
     document.querySelector('.svg-container').onwheel = function(e) {
         e.preventDefault();
-
-
-
         var w = viewBox.w;
         var h = viewBox.h;
         var mx = e.offsetX;
         var my = e.offsetY;  
+        console.log(scale)
         scale = svgSize.w/viewBox.w;
+        
         if (((viewBox.w >= maxWidth || viewBox.h >= maxHeight ) && e.deltaY > 0) || ((viewBox.w <= minWidth || viewBox.h <= minHeight ) && e.deltaY < 0) ) {
             var dx = 0;
             var dy = 0;
@@ -351,8 +355,8 @@ function gamePage(data, numberOfQuestions) {
     svgContainer.onmousemove = function(e){
         if (isPanning){
             endPoint = {x:e.x,y:e.y};
-            var dx = (startPoint.x - endPoint.x)/scale;
-            var dy = (startPoint.y - endPoint.y)/scale;
+            var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
+            var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
             var movedViewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
             svgImage.setAttribute('viewBox', `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`);
         }
@@ -367,8 +371,8 @@ function gamePage(data, numberOfQuestions) {
         svgRect = svgImage.getBoundingClientRect()
         if (isPanning){
             endPoint = {x:e.touches[0].screenX - svgRect.left,y:e.touches[0].screenY - svgRect.top};
-            var dx = (startPoint.x - endPoint.x)/scale;
-            var dy = (startPoint.y - endPoint.y)/scale;
+            var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
+            var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
             var movedViewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
             svgImage.setAttribute('viewBox', `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`);
         }
@@ -405,9 +409,12 @@ function gamePage(data, numberOfQuestions) {
             document.querySelectorAll('circle').forEach( (circle) => {
                 circle.setAttribute('r', ((viewBox.w - minWidth) / (maxWidth - minWidth) * 8) + 6) 
             })
+
+
+            
         }
 
-
+        //document.querySelector('.state-answer').innerHTML = `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`;
 
         
     }
@@ -415,8 +422,8 @@ function gamePage(data, numberOfQuestions) {
     svgContainer.onmouseup = function(e){
         if (isPanning){ 
             endPoint = {x:e.x,y:e.y};
-            var dx = (startPoint.x - endPoint.x)/scale;
-            var dy = (startPoint.y - endPoint.y)/scale;
+            var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
+            var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
             viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
             svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
             isPanning = false;
@@ -426,8 +433,8 @@ function gamePage(data, numberOfQuestions) {
     svgContainer.ontouchend = function(e){
         if (isPanning){ 
             if (!endPoint.x == 0 && !endPoint.y == 0) {
-                var dx = (startPoint.x - endPoint.x)/scale;
-                var dy = (startPoint.y - endPoint.y)/scale;
+                var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
+                var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
                 viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
                 svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
             }
@@ -442,6 +449,59 @@ function gamePage(data, numberOfQuestions) {
     
     svgContainer.onmouseleave = function(e){
         isPanning = false;
+    }
+    
+    document.querySelector('.question-container').ontouchstart = (e) => {
+        startX = e.touches[0].screenX;
+        document.querySelector('.question-mask').classList.remove('width-transition')
+    } 
+    let endX = 0;
+    document.querySelector('.question-container').ontouchmove = (e) => {
+        e.preventDefault();
+        endX = e.touches[0].screenX;
+        document.querySelector('.question-mask').style.width = parseInt(document.querySelector('.question-mask').offsetWidth) + (endX - startX) + 'px';
+        startX = endX;
+    }
+
+    document.querySelector('.question-container').ontouchend = (e) => {
+        startX = 0;
+        endX = 0;
+        if (parseInt(document.querySelector('.question-mask').style.width) < (document.querySelector('.card').getBoundingClientRect().right - document.querySelector('.card').getBoundingClientRect().left) * 0.7 ) {
+            document.querySelector('.question-mask').classList.add('width-transition')
+            document.querySelector('.question-mask').style.width = '0px';
+        } else {
+            document.querySelector('.question-mask').classList.add('width-transition')
+            document.querySelector('.question-mask').style.width = '100%';
+        }
+    }
+
+    document.querySelector('.answer-container').ontouchstart = (e) => {
+        if (e.srcElement !== svgImage && e.srcElement.parentElement.parentElement !== svgImage) {
+            startX = e.touches[0].screenX;
+            document.querySelector('.question-mask').classList.remove('width-transition')
+        }
+    } 
+    document.querySelector('.answer-container').ontouchmove = (e) => {
+        if (e.srcElement !== svgImage && e.srcElement.parentElement.parentElement !== svgImage) {
+            e.preventDefault();
+            endX = e.touches[0].screenX;
+            document.querySelector('.question-mask').style.width = parseInt(document.querySelector('.question-mask').offsetWidth) + (endX - startX) + 'px';
+            startX = endX;
+        }
+    }
+
+    document.querySelector('.answer-container').ontouchend = (e) => {
+        if (e.srcElement !== svgImage && e.srcElement.parentElement.parentElement !== svgImage) {
+            startX = 0;
+            endX = 0;
+            if (parseInt(document.querySelector('.question-mask').style.width) < (document.querySelector('.card').getBoundingClientRect().right - document.querySelector('.card').getBoundingClientRect().left) * 0.3 ) {
+                document.querySelector('.question-mask').classList.add('width-transition')
+                document.querySelector('.question-mask').style.width = '0px';
+            } else {
+                document.querySelector('.question-mask').classList.add('width-transition')
+                document.querySelector('.question-mask').style.width = '100%';
+            }
+        }
     }
 
     function keyboardHandler(e) {
@@ -458,13 +518,20 @@ function gamePage(data, numberOfQuestions) {
 
     function submitBtnHandler() {
         renderAnswer(correctAnswer, parks[parkIterator++]);
-        displayAnswer();
+        if (parseInt(window.getComputedStyle(document.querySelector('.question-mask')).width) > 0) { 
+            // Question is currently displayed
+            displayAnswer();
+            setTimeout(() => {correctAnswer = renderQuestion(parks[parkIterator], img)}, wipeTransitionTime );
+        } else {
+            correctAnswer = renderQuestion(parks[parkIterator], img);
+        }
         hint = 0;
-        document.querySelector('.btn-hint').classList.remove('disabled');
-        setTimeout(() => {correctAnswer = renderQuestion(parks[parkIterator], img)}, wipeTransitionTime );
+
+        
     }
 
     function nextBtnHandler() {
+        document.querySelector('.btn-hint').classList.remove('disabled');
         if (parkIterator < numberOfQuestions) {
             displayQuestion();
             // load next image
@@ -541,13 +608,13 @@ states = {
     SC: {numberOfParks: 0, correctParks: 0, viewBox: {x:940, y:433, w:331, h:199}},
     SD: {numberOfParks: 0, correctParks: 0, viewBox: {x:447, y:79, w:331, h:199}},
     TN: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    TX: {numberOfParks: 0, correctParks: 0, viewBox: {x:307, y:419, w:623, h:374}},
-    UT: {numberOfParks: 0, correctParks: 0, viewBox: {x:179, y:258, w:304, h:182}},
+    TX: {numberOfParks: 0, correctParks: 0, viewBox: {x:654, y:1207, w:236, h:142}},
+    UT: {numberOfParks: 0, correctParks: 0, viewBox: {x:613, y:1143, w:119, h:72}},
     VT: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
     VI: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    VA: {numberOfParks: 0, correctParks: 0, viewBox: {x:968, y:313, w:330, h:198}},
-    WA: {numberOfParks: 0, correctParks: 0, viewBox: {x:-57, y:-13, w:330, h:198}},
-    WV: {numberOfParks: 0, correctParks: 0, viewBox: {x:944, y:282, w:330, h:198}},
+    VA: {numberOfParks: 0, correctParks: 0, viewBox: {x:945, y:1174, w:84, h:50}},
+    WA: {numberOfParks: 0, correctParks: 0, viewBox: {x:534, y:1043, w:90, h:54}},
+    WV: {numberOfParks: 0, correctParks: 0, viewBox: {x:943, y:1160, w:82, h:50}},
     WI: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
     WY: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}} 
 }
