@@ -33,10 +33,10 @@ function renderGamePage() {
             <h1></h1>
             <p class='state-answer'></p> 
             <div class='svg-container'>
-                <svg viewbox= '0 0 1452 870'>
-                    <image href="/images/usa.png" style='width: 1452px'; height: '870px'; />
+                <svg viewbox= '0 0 1264 1329'>
+                    <image href="/images/usa-canada.svg" />
                 </svg>
-                <p class='tooltip'>TEST</p>
+                <p class='tooltip'></p>
             </div>
             <div class='model'>test</div>
             

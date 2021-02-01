@@ -67,7 +67,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 500px;
+    height: 510px;
     overflow: hidden;
     transition: width 0.8s linear;
 }
@@ -90,7 +90,7 @@ body {
     background-color: var(--black);
     position: relative;
     width: calc(100vw - 2rem);
-    height: 500px;
+    height: 510px;
 }
 
 img {
@@ -156,15 +156,12 @@ img.fullscreen {
 }
 
 svg {
-    /* border: 2px solid greenyellow; */
     width: 100%;
-    /* height: 250px; */
 }
-
+/* 
 circle:hover {
     r: 20px;
-}
-
+} */
 
 .tooltip {
     font-size: 0.8rem;
@@ -373,7 +370,7 @@ input[type=range] {
 
 .green {
     color: var(--green);
-    stroke: var(--green);
+    /* stroke: var(--green); */
 }
 
 .amber {
