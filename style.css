@@ -75,6 +75,10 @@ body {
     transition: width 0.3s;
 }
 
+.width-transition-bouncy {
+    transition: width 0.3s cubic-bezier(.23,-0.36,.83,1.39);
+}
+
 .question-mask.no-transitions, .answer-mask.no-transitions {
     transition: width 0s linear;
 }

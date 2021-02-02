@@ -33,7 +33,6 @@ function renderGamePage() {
             <h1></h1> -->
             <table class='score-breakdown-table green'>
                 <tbody>
-                <hr>
                 </tbody>
             </table>
             <p class='state-answer'>Select A State Then Submit</p> 
@@ -373,8 +372,9 @@ function renderGamePage() {
             </datalist>
 
             <input class='btn btn-amber-outline btn-submit' type="button" value='Submit' />
+            <input class='btn btn-green-outline btn-showmap' type='button' value='Show Map' />
         </div>
-
+        
         <input class='btn btn-green-outline btn-hint' type="button" value='Hint' />
     </div>
     `;

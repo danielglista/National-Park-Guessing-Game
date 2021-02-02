@@ -1,3 +1,11 @@
+function getNPSData(callback) {
+    fetch('nps.json', {
+    })
+    .then( res => {return res.json()})
+    .then( jsonRes => callback(jsonRes));
+
+}
+
 
 function capitalize(string) {
     return string.charAt(0).toUpperCase() + string.slice(1)
@@ -9,6 +17,46 @@ function getStateTwoDigitCode(stateName) {
 
 function getStateFullName(stateAbbr) {
     return stateNameList[stateAbbr];
+}
+
+function lonLatToXY(longitude, latitude) {
+    let westBoundry = -178.206173;
+    let eastBoundry = -52.631621;
+    let southBoundry = 18.910765;
+    let northBoundry = 83.090765;
+    let width = 1179//3624;
+    let height = 1329//3727;
+    let mapLonDelta = eastBoundry - westBoundry;
+    let x = (longitude - westBoundry) * (width/mapLonDelta)
+
+    let mapLatBottomDegree = southBoundry * Math.PI / 180;
+ 
+    latitude = latitude * Math.PI / 180;
+    let worldMapWidth = ((width / mapLonDelta) * 360) / (2 * Math.PI);
+    let mapOffsetY = (worldMapWidth / 2 * Math.log((1 + Math.sin(mapLatBottomDegree)) / (1 - Math.sin(mapLatBottomDegree))));
+    let y = height - ((worldMapWidth / 2 * Math.log((1 + Math.sin(latitude)) / (1 - Math.sin(latitude)))) - mapOffsetY);
+    y += 0;
+
+    return {x:x, y:y};
+}
+
+// This function was found on https://bost.ocks.org/mike/shuffle/
+function generateRandomParkOrder(array) {
+    var m = array.length, t, i;
+  
+    // While there remain elements to shuffle…
+    while (m) {
+  
+      // Pick a remaining element…
+      i = Math.floor(Math.random() * m--);
+  
+      // And swap it with the current element.
+      t = array[m];
+      array[m] = array[i];
+      array[i] = t;
+    }
+  
+    return array;
 }
 
 stateAbbrList = {
