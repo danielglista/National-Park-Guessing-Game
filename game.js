@@ -296,7 +296,8 @@ function gamePage(data, numberOfQuestions) {
     document.querySelector('.score').innerHTML = 0;
 
     addButtonEventListeners();
-    addMapNavigationEventListeners()
+    addMapNavigationEventListeners();
+    addTouchSlideEventListeners();
    
 
     randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator].images).length);
@@ -307,89 +308,7 @@ function gamePage(data, numberOfQuestions) {
     randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator + 1].images).length);
     img.src = parks[parkIterator + 1].images[randomIndex].url;
 
-    
-    document.querySelector('.text-input').addEventListener('blur', () => {
-        window.scrollTo(0, 0);
-    })
 
-    document.querySelectorAll('.state-paths > *').forEach( (path) => {
-        path.setAttribute('onclick', "pathClickHandler(this)");
-        path.setAttribute('ontouchstart', "pathClickHandler(this)");
-    })
-
-    document.querySelector('.fullscreen-container').addEventListener('click', toggleImgFullscreen);
-
-    document.addEventListener('fullscreenchange', () => {
-        document.querySelector('.park-img').classList.toggle('fullscreen');
-    });   
-    
-    document.querySelector('.question-container').ontouchstart = (e) => {
-        startX = e.touches[0].screenX;
-        document.querySelector('.question-mask').classList.remove('width-transition')
-    } 
-    let endX = 0;
-    document.querySelector('.question-container').ontouchmove = (e) => {
-        e.preventDefault();
-        endX = e.touches[0].screenX;
-        document.querySelector('.question-mask').style.width = parseInt(document.querySelector('.question-mask').offsetWidth) + (endX - startX) + 'px';
-        startX = endX;
-    }
-
-    document.querySelector('.question-container').ontouchend = (e) => {
-     
-        
-        startX = 0;
-        endX = 0;
-       
-        if (document.querySelector('.question-mask').offsetWidth < document.querySelector('.card').offsetWidth * 0.7 ) {
-            document.querySelector('.question-mask').classList.add('width-transition')
-            document.querySelector('.question-mask').style.width = '0px';
-            if (parseInt(document.querySelector('.question-counter').innerHTML)) {
-                setTimeout( () => {
-                    displayTutorial(2);
-                }, 3000);
-            }
-        } else {
-            document.querySelector('.question-mask').classList.add('width-transition')
-            document.querySelector('.question-mask').style.width = '100%';
-        }
-
-        if (document.querySelector('.question-mask').offsetWidth == (document.querySelector('.card').offsetWidth - 4)) {
-            document.querySelector('.question-mask').style.width = '85%';
-            setTimeout( () => {
-                document.querySelector('.question-mask').style.width = '100%';
-            }, 300)
-        }
-    }
-
-    document.querySelector('.answer-container').ontouchstart = (e) => {
-        if (e.srcElement !== svgImage && e.srcElement.parentElement.parentElement !== svgImage) {
-            startX = e.touches[0].screenX;
-            document.querySelector('.question-mask').classList.remove('width-transition')
-        }
-    } 
-    document.querySelector('.answer-container').ontouchmove = (e) => {
-        if (e.srcElement !== svgImage && e.srcElement.parentElement.parentElement !== svgImage) {
-            e.preventDefault();
-            endX = e.touches[0].screenX;
-            document.querySelector('.question-mask').style.width = parseInt(document.querySelector('.question-mask').offsetWidth) + (endX - startX) + 'px';
-            startX = endX;
-        }
-    }
-
-    document.querySelector('.answer-container').ontouchend = (e) => {
-        if (e.srcElement !== svgImage && e.srcElement.parentElement.parentElement !== svgImage) {
-            startX = 0;
-            endX = 0;
-            if (document.querySelector('.question-mask').offsetWidth < (document.querySelector('.card').offsetWidth) * 0.3 ) {
-                document.querySelector('.question-mask').classList.add('width-transition')
-                document.querySelector('.question-mask').style.width = '0px';
-            } else {
-                document.querySelector('.question-mask').classList.add('width-transition')
-                document.querySelector('.question-mask').style.width = '100%';
-            }
-        }
-    }
 
     function addButtonEventListeners() {
         document.addEventListener('keyup', (e) => {
@@ -609,6 +528,96 @@ function gamePage(data, numberOfQuestions) {
                 isZomming = false;
             }
         } 
+    }
+
+    function addTouchSlideEventListeners() {
+        let svgImage = document.querySelector('.mapSvg');
+        let startX = 0;
+        let endX = 0;
+        document.querySelector('.question-container').ontouchstart = (e) => {
+            startX = e.touches[0].screenX;
+            document.querySelector('.question-mask').classList.remove('width-transition')
+        } 
+
+        document.querySelector('.question-container').ontouchmove = (e) => {
+            e.preventDefault();
+            endX = e.touches[0].screenX;
+            document.querySelector('.question-mask').style.width = parseInt(document.querySelector('.question-mask').offsetWidth) + (endX - startX) + 'px';
+            startX = endX;
+        }
+    
+        document.querySelector('.question-container').ontouchend = (e) => {
+         
+            
+            startX = 0;
+            endX = 0;
+           
+            if (document.querySelector('.question-mask').offsetWidth < document.querySelector('.card').offsetWidth * 0.7 ) {
+                document.querySelector('.question-mask').classList.add('width-transition')
+                document.querySelector('.question-mask').style.width = '0px';
+                if (parseInt(document.querySelector('.question-counter').innerHTML)) {
+                    setTimeout( () => {
+                        displayTutorial(2);
+                    }, 3000);
+                }
+            } else {
+                document.querySelector('.question-mask').classList.add('width-transition')
+                document.querySelector('.question-mask').style.width = '100%';
+            }
+    
+            if (document.querySelector('.question-mask').offsetWidth == (document.querySelector('.card').offsetWidth - 4)) {
+                document.querySelector('.question-mask').style.width = '85%';
+                setTimeout( () => {
+                    document.querySelector('.question-mask').style.width = '100%';
+                }, 300)
+            }
+        }
+    
+        document.querySelector('.answer-container').ontouchstart = (e) => {
+            if (e.srcElement !== svgImage && e.srcElement.parentElement.parentElement !== svgImage) {
+                startX = e.touches[0].screenX;
+                document.querySelector('.question-mask').classList.remove('width-transition')
+            }
+        } 
+        document.querySelector('.answer-container').ontouchmove = (e) => {
+            if (e.srcElement !== svgImage && e.srcElement.parentElement.parentElement !== svgImage) {
+                e.preventDefault();
+                endX = e.touches[0].screenX;
+                document.querySelector('.question-mask').style.width = parseInt(document.querySelector('.question-mask').offsetWidth) + (endX - startX) + 'px';
+                startX = endX;
+            }
+        }
+    
+        document.querySelector('.answer-container').ontouchend = (e) => {
+            if (e.srcElement !== svgImage && e.srcElement.parentElement.parentElement !== svgImage) {
+                startX = 0;
+                endX = 0;
+                if (document.querySelector('.question-mask').offsetWidth < (document.querySelector('.card').offsetWidth) * 0.3 ) {
+                    document.querySelector('.question-mask').classList.add('width-transition')
+                    document.querySelector('.question-mask').style.width = '0px';
+                } else {
+                    document.querySelector('.question-mask').classList.add('width-transition')
+                    document.querySelector('.question-mask').style.width = '100%';
+                }
+            }
+        }
+    }
+
+    function addUtilityEventListeners() {       
+        document.querySelector('.text-input').addEventListener('blur', () => {
+            window.scrollTo(0, 0);
+        })
+
+        document.querySelectorAll('.state-paths > *').forEach( (path) => {
+            path.setAttribute('onclick', "pathClickHandler(this)");
+            path.setAttribute('ontouchstart', "pathClickHandler(this)");
+        })
+
+        document.querySelector('.fullscreen-container').addEventListener('click', toggleImgFullscreen);
+
+        document.addEventListener('fullscreenchange', () => {
+            document.querySelector('.park-img').classList.toggle('fullscreen');
+        });   
     }
 }
 
