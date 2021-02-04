@@ -29,15 +29,18 @@ function renderGamePage() {
 
     <div class="answer-mask" style='z-index: 5;'>
         <div class='answer-container green crt'>
-           <!-- <i class="far fa-9x"></i>
-            <h1></h1> -->
-            <table class='score-breakdown-table green'>
+            <table class='score-breakdown-table amber'>
                 <tbody>
+                    <tr><td>Base</td><td>100</td></tr>
+                    <tr><td>Answer</td><td>???</td></tr>
+                    <tr><td>Hints</td><td>???</td></tr>
+                    <tr><td>Time</td><td>???</td></tr>
+                    <tr><td>Total</td><td>???</td></tr>
                 </tbody>
             </table>
-            <p class='state-answer'>Select A State Then Submit</p> 
+            <p class='state-answer'></p>
             <div class='svg-container'>
-                <svg viewbox= '0 0 1264 1329' >
+                <svg class='mapSvg' viewbox='0 0 1264 1329' >
                 <g class='state-paths' fill='#282828' fill-opacity='0.01' stroke='#ffbb00' stroke-width='1'>
                 <path
                 id="US-AK"
@@ -305,7 +308,6 @@ function renderGamePage() {
                 </svg>
                 <p class='tooltip'></p>
             </div>
-            
             
             
             <input class='btn btn-next disabled hidden' type='button' value='Next' />

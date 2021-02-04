@@ -14419,7 +14419,7 @@
 {"url":"https://www.nps.gov/npsa/planyourvisit/images/P1010059.JPG?maxwidth=1200&maxheight=1200&autorotate=false"}]
 ,"weatherInfo":"American Samoa is in the South Pacific Ocean, between the Equator and the Tropic of Capricorn. A tropical climate prevails with warm or hot temperatures year-round and high humidity. Rain showers are frequent and can last only for a few minutes or all-day. The average annual rainfall is 125-inches in the dryer areas to as much as 300-inches in the highest mountains. Tropical storms are more prevalent during the long, wet summer season (October -May) and a slightly cooler and drier season (June-September)"
 
-,"name":"National Park of American Samoa"
+,"name":"American Samoa"
 
 ,"designation":"National Park"
 
@@ -17546,7 +17546,50 @@
 
 ,"operatingHours":[{"exceptions":[],"description":"In the Tucson Mountain District (west), the park is open to vehicles from sunrise to sunset daily. (Actual times vary throughout the year).\nThe Rincon Mountain District (east), the park is open to vehicles from 5:00 a.m. to 8:00 p.m. daily in the summer, and 5:00 a.m. to 6:00 p.pm in the winter.\nYou can walk or bike into the park 24 hours a day.\nVisitor Center - Both Districts are open 364 days per year.\nOperating Hours: Monday - Sunday 9:00 a.m. to 5:00 p.m. (closed Christmas day)","standardHours":{"wednesday":"9:00AM - 5:00PM","monday":"9:00AM - 5:00PM","thursday":"9:00AM - 5:00PM","sunday":"9:00AM - 5:00PM","tuesday":"9:00AM - 5:00PM","friday":"9:00AM - 5:00PM","saturday":"9:00AM - 5:00PM"},"name":"Saguaro National Park Visitor Center"}]
 ,"addresses":[{"postalCode":"85730","city":"Tucson","stateCode":"AZ","line1":"3693 S Old Spanish Trail","type":"Physical","line3":"","line2":""},{"postalCode":"85730","city":"Tucson","stateCode":"AZ","line1":"3693 S Old Spanish Trail","type":"Mailing","line3":"","line2":""}]
-,"images":[{"credit":"NPS Photo","title":"Saguaro Flowers","altText":"Saguaro flowers","caption":"The flowering season in Saguaro National Park attracts visitors from all over the world.","url":"https://www.nps.gov/common/uploads/structured_data/5CB8B2F6-01B7-9A50-73702A355E4136B8.jpg"},{"credit":"NPS Photo/ Bolyard","title":"Flowering Fishhook Pincushion Cactus","altText":"A flowering fishhook pincushion cactus","caption":"Wildflower season at Saguaro National Park is at it's peak in the month of MArch. The Pincushion cactus, however, blooms April through August.","url":"https://www.nps.gov/common/uploads/structured_data/3C858462-1DD8-B71B-0BB499810C61332C.jpg"},{"credit":"NPS Photo","title":"Coyote Pups","altText":"Two coyote pups captured on a wilderness camera","caption":"Saguaro National Park has a vast variety of wildlife, and with the help of wilderness cameras, can be photographed to help with studies and for visitors to learn about animals only seen by chance.","url":"https://www.nps.gov/common/uploads/structured_data/3C858613-1DD8-B71B-0BEFB533FAB3FB55.jpg"},{"credit":"NPS Photo","title":"Saguaro National Park Lighting Storm","altText":"Lightning strike captured on camera with saguaros in the background","caption":"Saguaro deaths are usually attributed to natural weather conditions and other natural phenomena. Specifically, lightning strikes have been known to strike saguaros due to the large amount of water stored within their fleshy tissue.","url":"https://www.nps.gov/common/uploads/structured_data/3C85873C-1DD8-B71B-0BA5D81599611142.jpg"},{"credit":"NPS Photo","title":"Weather at Saguaro National Park","altText":"Rare Sight of snow in Saguaro National Park East Visitor Center (Rincon Mountain District)","caption":"Saguaro National Park summers can be extremely hot with temperatures exceeding 105 degrees F, lows averaging 72 degrees F.  Winters are mild warm days averaging 65 degrees F and cool nights averaging 40 degrees F. Snowfall is extremely rare in the area.","url":"https://www.nps.gov/common/uploads/structured_data/3C858903-1DD8-B71B-0BE2312B40DB3D26.jpg"},{"credit":"NPS Photo","title":"Group of Regal Horned Lizards","altText":"A group of Phrynosoma solare, or regal horned lizards.","caption":"Regal horned lizards are one of many reptiles in the park, who have adapted to living in the harsh desert environment. Information on how different species survive can be found on the park's website, visitor center, or through our many programs offered.","url":"https://www.nps.gov/common/uploads/structured_data/3C858AB6-1DD8-B71B-0B0F6C0A56410894.jpg"}]
+,  "images": [
+    {
+        "credit": "NPS Photo",
+        "title": "Great House",
+        "altText": "eathern building under modern roof structure",
+        "caption": "The Great House at Casa Grande Ruins has existed for over 600 years.",
+        "url": "https://www.nps.gov/common/uploads/structured_data/3C7D9776-1DD8-B71B-0B4D6AE7F16F082E.jpg"
+    },
+    {
+        "credit": "NPS Photo",
+        "title": "Great House from the South",
+        "altText": "earthern ruins including the Great House and other parts",
+        "caption": "A highlight of Compound A is the Great House but it is not the only earthern building to intrigue visitors.",
+        "url": "https://www.nps.gov/common/uploads/structured_data/3C7D9904-1DD8-B71B-0B3C8ECB25C6B23E.jpg"
+    },
+    {
+        "credit": "NPS Photo",
+        "title": "Great House in the Sonoran Desert",
+        "altText": "earthern Great House with its roof among desert plants",
+        "caption": "The Great House at Casa Grande Ruins is a sentinel of the desert.",
+        "url": "https://www.nps.gov/common/uploads/structured_data/3C7D9C42-1DD8-B71B-0B8517554C3471EE.jpg"
+    },
+    {
+        "credit": "NPS Photo",
+        "title": "Morning from the Northeast",
+        "altText": "earthern Great House standing out in the Sonoran Desert plants",
+        "caption": "The Great House at Casa Grande may have been an orientation point for travelers and traders.",
+        "url": "https://www.nps.gov/common/uploads/structured_data/3C7D9E06-1DD8-B71B-0BB8059CC583426B.jpg"
+    },
+    {
+        "credit": "NPS Photo",
+        "title": "Historic Sign",
+        "altText": "historic copper sign with Great House and saguaro flanking",
+        "caption": "The park's historic copper sign was relocated with roadway changes, and now sits near the visitor center.",
+        "url": "https://www.nps.gov/common/uploads/structured_data/3C7D9FC6-1DD8-B71B-0B202381A00477C5.jpg"
+    },
+    {
+        "credit": "NPS Photo",
+        "title": "Actors Recreating Jewelry",
+        "altText": "child, adult female, adult male American Indian actors in costume making jewelry in movie shoot",
+        "caption": "In this scene from the park movie, actors demonstrate jewelry making as done in ancestral times.",
+        "url": "https://www.nps.gov/common/uploads/structured_data/3C7DA145-1DD8-B71B-0B64585CAF0B63B2.jpg"
+    }
+]
 ,"weatherInfo":"Winter Season With daytime temperature from the low 50's to the high 70's Summer Season As we get deeper into the summer season, temperatures will range from mid-90's to low 110's. This is a great time to experience the desert as the day breaks or in the late of the day as the sun disappears behind the surrounding mountain ranges. During the late spring and summer months Saguaro National Park only offers interpretive programs on an intermittent basis."
 
 ,"name":"Saguaro"
@@ -21255,7 +21298,7 @@
 
 ,"parkCode":"wrst"
 
-,"description":"Wrangell-St. Elias is a vast national park that rises from the ocean all the way up to 18,008 ft. At 13.2 million acres, the park is the same size as Yellowstone National Park, Yosemite National Park, and Switzerland combined! Within this wild landscape, people continue to live off the land as they have done for centuries. This rugged, beautiful land is filled with opportunities for adventure."
+,"description":"Wrangell - St Elias is a vast national park that rises from the ocean all the way up to 18,008 ft. At 13.2 million acres, the park is the same size as Yellowstone National Park, Yosemite National Park, and Switzerland combined! Within this wild landscape, people continue to live off the land as they have done for centuries. This rugged, beautiful land is filled with opportunities for adventure."
 
 ,"latitude":
 

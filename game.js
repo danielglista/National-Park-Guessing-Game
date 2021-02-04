@@ -1,6 +1,6 @@
 let debug = 0.8; // To be fixed in next release
 const wipeTransitionTime = 1000*debug; // in milliseconds
-let viewBox = {x:0,y:0,w:1179,h:1329}; // to be moved into gamePage.js
+let viewBox = {x:593,y:861,w:354,h:399}; // to be moved into gamePage.js
 const maxWidth = 951;
 const minWidth = 48;
 const maxHeight = 1000;
@@ -8,6 +8,8 @@ const minHeight = 50;
 let hint = 0;
 let startTime = 0;
 let stopTime = 0;
+let correctAnswer = '';
+
 
 function showTooltip(e) {
     let element = e.srcElement;
@@ -43,7 +45,6 @@ function renderQuestion(park, img, hint=0) {
         document.querySelector('.park-description').innerHTML = document.querySelector('.park-description').innerHTML.replaceAll('<span class="green">_____</span>', `<span class="green">${park.name}</span>`); 
     }
 
-    return park.states;
     
 }
 
@@ -86,13 +87,13 @@ function renderScoreBreakdownTable(correctStates) {
 
     switch(hint) {
         case 0:
-            hintMultiplier = 1.5;
-            break;
-        case 1:
             hintMultiplier = 1.25;
             break;
+        case 1:
+            hintMultiplier = 1.0;
+            break;
         case 2:
-            hintMultiplier = 1;
+            hintMultiplier = 0.75;
             break;
     }
 
@@ -101,11 +102,10 @@ function renderScoreBreakdownTable(correctStates) {
 
     let seconds = Math.round(elapsedTime);
     
-    timeMultiplier = 2.25 * Math.abs(1 - (seconds / 66));
-    console.log(seconds)
+    timeMultiplier = 2.25 * Math.abs(1 - (seconds / 60));
     timeMultiplier = Math.round(timeMultiplier * 100) / 100;
 
-    timeMultiplier = Math.min(timeMultiplier, 2.0);
+    timeMultiplier = Math.min(timeMultiplier, 1.6);
     timeMultiplier = Math.max(timeMultiplier, 1.0);
 
 
@@ -115,27 +115,58 @@ function renderScoreBreakdownTable(correctStates) {
 
     tbody.innerHTML = `
         <tr>
-            <td>Base</td>
-            <td>100</td>
-        </tr>
-        <tr>
             <td>Answer</td>
-            <td>x${answerMultiplier}</td>
+            <td class=''><100 miles</td>
+            <td class=''><p>50</p></td>
         </tr>
         <tr>
             <td>Hints</td>
+            <td class=''>0 Hints</td>
             <td>x${hintMultiplier}</td>
         </tr>
         <tr>
             <td>Time</td>
-            <td>x${timeMultiplier}</td>
+            <td class=''>5 Seconds</td>
+            <td class=''>x${timeMultiplier}</td>
         </tr>
-        <hr>
+        <tr>
+            <td>Streak</td>
+            <td>7x</td>
+            <td>x1.3</td>
+        </tr>
         <tr>
             <td>Total</td>
+            <td></td>
             <td>${total}</td>
         </tr>
         `;
+
+    document.querySelector('.score').setAttribute('data-score', parseInt(document.querySelector('.score').innerHTML) + total)
+}
+
+function resetScorBreakdownTable() {
+    document.querySelector('.score-breakdown-table tbody').innerHTML = `
+    <tr>
+        <td>Base</td>
+        <td>100</td>
+    </tr>
+    <tr>
+        <td>Answer</td>
+        <td>???</td>
+    </tr>
+    <tr>
+        <td>Hints</td>
+        <td>???</td>
+    </tr>
+    <tr>
+        <td>Time</td>
+        <td>???</td>
+    </tr>
+    <tr>
+        <td>Total</td>
+        <td>???</td>
+    </tr>
+    `;
 }
 
 function renderAnswer(correctAnswer, park) {
@@ -160,18 +191,17 @@ function renderAnswer(correctAnswer, park) {
         // document.querySelector('.answer-container h1').innerHTML = '+1';
         document.querySelector('.answer-container input').classList.add('btn-green-outline');
         document.querySelector('.answer-container input').classList.remove('btn-red-outline');
-        document.querySelector('.score').setAttribute('data-score', parseInt(document.querySelector('.score').innerHTML) + 1)
         for (let i of correctStates) {
             states[i].correctParks++;
         }
-        document.querySelector('svg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y}' r='15' fill='#33ff00' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
+        document.querySelector('.mapSvg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y}' r='15' fill='#33ff00' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
     } else {
         document.querySelector('.answer-container').className = document.querySelector('.answer-container').className.replace('green', 'red');
         // document.querySelector('.answer-container i').className = 'fas fa-times fa-9x';
         // document.querySelector('.answer-container h1').innerHTML = '';
         document.querySelector('.answer-container input').classList.add('btn-red-outline');
         document.querySelector('.answer-container input').classList.remove('btn-green-outline');
-        document.querySelector('svg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y}' r='15' fill='#ff4000' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
+        document.querySelector('.mapSvg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y}' r='15' fill='#ff4000' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
     }
     document.querySelector('.state-answer').innerHTML = stateNamesString + ' - ' + park.name;
 
@@ -202,7 +232,57 @@ function pathClickHandler(path) {
     document.querySelector('.text-input').value = path.getAttribute('title');
 }
 
+function displayTutorial(tutorial) {
+    if (tutorial == 1) {
+        document.querySelector('.park-description-container').innerHTML += `
+            <div class='tutorial-mask crt'>
+            </div>
+            <div class='tutorial-container'>
+                <svg viewBox='0 40 100 20' height='74' width='300'>
+                    <rect x='10' y='45' width='80' height='1' fill='#d8d8d8' /> 
+                    <rect x='10' y='55' width='80' height='1' fill='#d8d8d8' />   
+                    <rect x='0' y='50' width='20' height='1' fill='#d8d8d8' style='transform: rotate(-45deg) translate(-35px, -15px);' />  
+                    <rect x='0' y='50' width='20' height='1' fill='#d8d8d8' style='transform: rotate(45deg) translate(35px, -15px);' /> 
+                </svg>
+                <p class='text-center white' style='text-transform: uppercase;'>Swipe To Show Map</p>
+            </div>
+        `;
+        setTimeout( () => {
+            document.querySelector('.tutorial-container').style.opacity = 1;
+        }, 0)
+    }
+    if (tutorial == 2) {
+        document.querySelector('.tutorial-container').remove();
+        let container = document.createElement('div');
+        container.classList.add('tutorial-container');
+        container.innerHTML = `
+            <p class='state-answer white text-center mt-1' style='text-transform: uppercase;'>Select A State Then Submit or</p> 
+            <svg viewBox='0 40 100 20' height='74' width='300'>
+                <rect x='10' y='45' width='80' height='1' fill='#d8d8d8' /> 
+                <rect x='10' y='55' width='80' height='1' fill='#d8d8d8' />   
+                <rect x='100' y='50' width='20' height='1' fill='#d8d8d8' style='transform: rotate(-135deg) translate(-205px, -15px);' />  
+                <rect x='100' y='50' width='20' height='1' fill='#d8d8d8' style='transform: rotate(135deg) translate(-136px, -156px);' /> 
+            </svg>
+            <p class='text-center white' style='text-transform: uppercase;'>Swipe To Show Question</p>
+        `;
+
+        document.querySelector('.answer-container').appendChild(container);
+
+        setTimeout( () => {
+           document.querySelector('.tutorial-container').style.opacity = 1;
+        }, 0)
+    }
+    
+    
+}
+
 function gamePage(data, numberOfQuestions) {
+
+    let parks = [];
+    let parkIterator = 0;
+    let img = new Image;
+    let randomInex = 0;
+    let correctAnswer = '';
 
     document.querySelector('.card').innerHTML = renderGamePage();
 
@@ -214,17 +294,16 @@ function gamePage(data, numberOfQuestions) {
         states[i].correctParks = 0;
     }
 
-    let parks = [];
     for (let i in data) {
         if (data[i].designation.includes("National Park")) parks.push(data[i]); 
     }
 
     generateRandomParkOrder(parks);
-    let parkIterator = 0;
-    let img = new Image;
-    let randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator].images).length);
+   
+    randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator].images).length);
     img.src = parks[parkIterator].images[randomIndex].url;
-    let correctAnswer = renderQuestion(parks[parkIterator], img);
+    renderQuestion(parks[parkIterator], img);
+    correctAnswer = parks[parkIterator].states;
 
     randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator + 1].images).length);
     img.src = parks[parkIterator + 1].images[randomIndex].url;
@@ -233,6 +312,10 @@ function gamePage(data, numberOfQuestions) {
     document.querySelector('.question-counter').innerHTML = 1;
     document.querySelector('.question-total').innerHTML = numberOfQuestions;
     document.querySelector('.score').innerHTML = 0;
+
+    setTimeout( () => {
+        displayTutorial(1);
+    }, 3000);
 
 
     document.querySelectorAll('.state-paths > *').forEach( (path) => {
@@ -256,30 +339,10 @@ function gamePage(data, numberOfQuestions) {
         }
     }
 
-    document.addEventListener('keyup', keyboardHandler);
+    addButtonEventListeners()
 
-    document.querySelector('.btn-submit').addEventListener('click', () => {
-        submitBtnHandler();
-    });
-
-    document.querySelector('.btn-submit').addEventListener('keypress', (e) => {
-        e.preventDefault();
-    });
-
-    document.querySelector('.btn-next').addEventListener('click', () => {
-        nextBtnHandler()
-    })
-
-    document.querySelector('.btn-next').addEventListener('keypress', (e) => {
-        e.preventDefault();
-    });
-
-    document.querySelector('.btn-hint').addEventListener('click', hintHander);
-
-    let svgImage = document.querySelector('svg');
+    let svgImage = document.querySelector('.mapSvg');
     let svgContainer = document.querySelector('.svg-container');
-
-
 
     svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
     const svgSize = {w:svgImage.clientWidth,h:svgImage.clientHeight};
@@ -384,6 +447,7 @@ function gamePage(data, numberOfQuestions) {
             var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
             var movedViewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
             svgImage.setAttribute('viewBox', `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`);
+            // document.querySelector('.state-answer').innerHTML = `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`
         }
         if (isZomming) {
             endPoint = {x:e.touches[0].screenX - svgRect.left,y:e.touches[0].screenY - svgRect.top};
@@ -457,7 +521,14 @@ function gamePage(data, numberOfQuestions) {
     }
     
     svgContainer.onmouseleave = function(e){
-        isPanning = false;
+        if (isPanning){ 
+            endPoint = {x:e.x,y:e.y};
+            var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
+            var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
+            viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
+            svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+            isPanning = false;
+        }
     }
     
     document.querySelector('.question-container').ontouchstart = (e) => {
@@ -481,19 +552,20 @@ function gamePage(data, numberOfQuestions) {
         if (document.querySelector('.question-mask').offsetWidth < document.querySelector('.card').offsetWidth * 0.7 ) {
             document.querySelector('.question-mask').classList.add('width-transition')
             document.querySelector('.question-mask').style.width = '0px';
+            if (parseInt(document.querySelector('.question-counter').innerHTML)) {
+                setTimeout( () => {
+                    displayTutorial(2);
+                }, 3000);
+            }
         } else {
             document.querySelector('.question-mask').classList.add('width-transition')
             document.querySelector('.question-mask').style.width = '100%';
         }
 
         if (document.querySelector('.question-mask').offsetWidth == (document.querySelector('.card').offsetWidth - 4)) {
-            document.querySelector('.question-mask').classList.add('width-transition-bouncy')
             document.querySelector('.question-mask').style.width = '85%';
             setTimeout( () => {
                 document.querySelector('.question-mask').style.width = '100%';
-                setTimeout( () => {
-                    document.querySelector('.question-mask').classList.remove('width-transition-bouncy')
-                }, 300);
             }, 300)
         }
     }
@@ -527,53 +599,107 @@ function gamePage(data, numberOfQuestions) {
         }
     }
 
-    function keyboardHandler(e) {
-        if (e.key == 'Enter') {
-            if (document.querySelector('.question-mask').style.zIndex == 10 && !document.querySelector('.btn-submit').classList.contains('disabled')) {
-                // When question is displayed
-                submitBtnHandler();
-            } else  if (document.querySelector('.answer-mask').style.zIndex == 10 && !document.querySelector('.btn-next').classList.contains('disabled')) {
-                // When answer is displayed
-                nextBtnHandler();
+    function addButtonEventListeners() {
+        document.addEventListener('keyup', (e) => {
+            if (e.key == 'Enter') {
+                if (document.querySelector('.question-mask').style.zIndex == 10 && !document.querySelector('.btn-submit').classList.contains('disabled')) {
+                    // When question is displayed
+                    const values = submitBtnHandler(parks, parkIterator, correctAnswer, img);
+                    correctAnswer = values.correctAnswer;
+                    parkIterator = values.parkIterator;
+                    hint = values.hint;
+                } else  if (document.querySelector('.answer-mask').style.zIndex == 10 && !document.querySelector('.btn-next').classList.contains('disabled')) {
+                    // When answer is displayed
+                    const values = nextBtnHandler(parkIterator, numberOfQuestions, parks[parkIterator + 1]);
+                    img.src = values.imgSrc;
+                }
             }
-        }
+        });
+
+        document.querySelector('.btn-submit').addEventListener('click', () => {
+            const values = submitBtnHandler(parks, parkIterator, correctAnswer, img);
+            correctAnswer = values.correctAnswer;
+            parkIterator = values.parkIterator;
+            hint = values.hint;
+        });
+
+        document.querySelector('.btn-submit').addEventListener('keypress', (e) => {
+            e.preventDefault();
+        });
+
+        document.querySelector('.btn-next').addEventListener('click', () => {
+            const values = nextBtnHandler(parkIterator, numberOfQuestions, parks[parkIterator + 1]);
+            img.src = values.imgSrc;
+        })
+
+        document.querySelector('.btn-next').addEventListener('keypress', (e) => {
+            e.preventDefault();
+        });
+
+        document.querySelector('.btn-hint').addEventListener('click', () => {
+            const values = hintBtnHander(parks[parkIterator], hint);
+            hint = values.hint;
+        });
+    }
+}
+
+
+
+function keyboardHandler(e) {
+  
+}
+
+function submitBtnHandler(parks, parkIterator, correctAnswer, img) {
+    let currentPark = parks[parkIterator];
+    let nextPark = parks[parkIterator + 1];
+    endTime = performance.now();
+    renderAnswer(correctAnswer, currentPark);
+    if (parseInt(document.querySelector('.question-mask').offsetWidth) > 0) { 
+        // Question is currently displayed
+        displayAnswer();
+        setTimeout(() => {
+            renderQuestion(nextPark, img);
+        }, wipeTransitionTime );
+    } else {
+        // Map is currently displayed
+        renderQuestion(nextPark, img);
     }
 
-    function submitBtnHandler() {
-        endTime = performance.now();
-        renderAnswer(correctAnswer, parks[parkIterator++]);
-        if (parseInt(window.getComputedStyle(document.querySelector('.question-mask')).width) > 0) { 
-            // Question is currently displayed
-            displayAnswer();
-            setTimeout(() => {correctAnswer = renderQuestion(parks[parkIterator], img)}, wipeTransitionTime );
-        } else {
-            correctAnswer = renderQuestion(parks[parkIterator], img);
-        }
-        hint = 0;
-
-        
+    return {
+        correctAnswer: nextPark.states,
+        parkIterator: parkIterator + 1,
+        hint: 0
     }
+}
 
-    function nextBtnHandler() {
-        document.querySelector('.btn-hint').classList.remove('disabled');
-        if (parkIterator < numberOfQuestions) {
-            displayQuestion();
-            // load next image
-            randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator + 1].images).length);
-            img.src = parks[parkIterator + 1].images[randomIndex].url;
-        } else {
-            document.querySelector('.score').innerHTML = document.querySelector('.score').getAttribute('data-score');
-            resultPage();
-        }
+function nextBtnHandler(parkIterator, numberOfQuestions, nextPark) {
+    document.querySelector('.btn-hint').classList.remove('disabled');
+    if (parkIterator < numberOfQuestions) {
+        displayQuestion();
+        // load next image
+        let randomIndex = Math.floor(Math.random() * Object.keys(nextPark.images).length);
+        return {imgSrc: nextPark.images[randomIndex].url};
+        resetScorBreakdownTable();
+    } else {
+        document.querySelector('.score').innerHTML = document.querySelector('.score').getAttribute('data-score');
+        resultPage();
     }
+    return null;
+}
 
-    function hintHander() {
-        renderQuestion(parks[parkIterator], img, ++hint);
-        if (hint > 1) {
-            document.querySelector('.btn-hint').classList.add('disabled');
-            document.querySelector('.btn-hint').blur();
-        }
+function hintBtnHander(park, hint) {
+    renderQuestion(park, null, ++hint);
+    if (hint > 1) {
+        document.querySelector('.btn-hint').classList.add('disabled');
+        document.querySelector('.btn-hint').blur();
     }
+    return {
+        hint: hint
+    }
+}
+
+function showMapBtnHandler() {
+
 }
 
 states = {
