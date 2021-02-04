@@ -281,25 +281,24 @@ function gamePage(data, numberOfQuestions) {
     let parks = [];
     let parkIterator = 0;
     let img = new Image;
-    let randomInex = 0;
+    let randomIndex = 0;
     let correctAnswer = '';
-
-    document.querySelector('.card').innerHTML = renderGamePage();
-
-    document.querySelector('.status').classList.remove('hidden');
-
-    // Reset states object in case user restarts game
-    for (let i in states) {
-        states[i].numberOfParks = 0;
-        states[i].correctParks = 0;
-    }
 
     for (let i in data) {
         if (data[i].designation.includes("National Park")) parks.push(data[i]); 
     }
-
     generateRandomParkOrder(parks);
+
+    document.querySelector('.card').innerHTML = renderGamePage();
+    document.querySelector('.status').classList.remove('hidden');
+    document.querySelector('.question-counter').innerHTML = 1;
+    document.querySelector('.question-total').innerHTML = numberOfQuestions;
+    document.querySelector('.score').innerHTML = 0;
+
+    addButtonEventListeners();
+    addMapNavigationEventListeners()
    
+
     randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator].images).length);
     img.src = parks[parkIterator].images[randomIndex].url;
     renderQuestion(parks[parkIterator], img);
@@ -308,15 +307,10 @@ function gamePage(data, numberOfQuestions) {
     randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator + 1].images).length);
     img.src = parks[parkIterator + 1].images[randomIndex].url;
 
-
-    document.querySelector('.question-counter').innerHTML = 1;
-    document.querySelector('.question-total').innerHTML = numberOfQuestions;
-    document.querySelector('.score').innerHTML = 0;
-
-    setTimeout( () => {
-        displayTutorial(1);
-    }, 3000);
-
+    
+    document.querySelector('.text-input').addEventListener('blur', () => {
+        window.scrollTo(0, 0);
+    })
 
     document.querySelectorAll('.state-paths > *').forEach( (path) => {
         path.setAttribute('onclick', "pathClickHandler(this)");
@@ -327,209 +321,7 @@ function gamePage(data, numberOfQuestions) {
 
     document.addEventListener('fullscreenchange', () => {
         document.querySelector('.park-img').classList.toggle('fullscreen');
-    });
-
-    function toggleImgFullscreen() {
-        if (!document.fullscreenElement) {
-            document.querySelector('.fullscreen-container').requestFullscreen();
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            }
-        }
-    }
-
-    addButtonEventListeners()
-
-    let svgImage = document.querySelector('.mapSvg');
-    let svgContainer = document.querySelector('.svg-container');
-
-    svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
-    const svgSize = {w:svgImage.clientWidth,h:svgImage.clientHeight};
-    var isPanning = false;
-    let isZomming = false;
-    var startPoint = {x:0,y:0};
-    var endPoint = {x:0,y:0};
-    var scale =  svgSize.w/viewBox.w;
-    let startPoint2 = {x:0,y:0};
-    let endPoint2 = {x:0,y:0}
-    let svgRect = svgImage.getBoundingClientRect();
-    let panningCoeficient = 2;
-    
-    let startX = 0;
-    let startY = 0;
-
-    document.querySelector('.text-input').addEventListener('blur', () => {
-        window.scrollTo(0, 0);
-    })
-
-    document.querySelector('.svg-container').onwheel = function(e) {
-        e.preventDefault();
-        var w = viewBox.w;
-        var h = viewBox.h;
-        var mx = e.offsetX;
-        var my = e.offsetY;  
-
-        scale = svgSize.w/viewBox.w;
-        
-        if (((viewBox.w >= maxWidth || viewBox.h >= maxHeight ) && e.deltaY > 0) || ((viewBox.w <= minWidth || viewBox.h <= minHeight ) && e.deltaY < 0) ) {
-            var dx = 0;
-            var dy = 0;
-            var dw = 0;
-            var dh = 0;
-        } else { 
-            var dw = w*Math.sign(-e.deltaY)*0.08;
-            var dh = h*Math.sign(-e.deltaY)*0.08;
-            var dx = dw*mx/svgSize.w;
-            var dy = dh*my/svgSize.h;
- 
-        }
-        document.querySelectorAll('circle').forEach( (circle) => {
-            circle.setAttribute('r', ((viewBox.w - minWidth) / (maxWidth - minWidth) * 10) + 4) 
-        })
-
-        viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
-        svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
-    }
-
-    
-
-    svgContainer.onmousedown = function(e){
-        isPanning = true;
-        startPoint = {x:e.x,y:e.y};  
-    }
-
-    svgContainer.ontouchstart = function(e){
-        e.preventDefault();
-        
-        svgRect = svgImage.getBoundingClientRect()
-
-
-        isPanning = true;
-        startPoint = {x:e.touches[0].screenX - svgRect.left ,y:e.touches[0].screenY - svgRect.top};   
-        
-
-        if (e.touches[1]) {
-            startPoint2 = {x:e.touches[1].screenX - svgRect.left,y:e.touches[1].screenY - svgRect.top}
-            isZomming = true;
-
-            startX = (startPoint.x + startPoint2.x ) / 2
-            
-            startY = (startPoint.y + startPoint2.y ) / 2
-           
-        }
-        let tooltip = document.querySelector('.tooltip')
-        let tooltipRect = tooltip.getBoundingClientRect();
-        document.querySelector('.tooltip').style.left = e.touches[0].screenX - svgRect.left - ((tooltipRect.right - tooltipRect.left) / 2) + 'px';
-        document.querySelector('.tooltip').style.top = e.touches[0].screenY - svgRect.top - 80 + 'px';
-    }
-    
-    svgContainer.onmousemove = function(e){
-        if (isPanning){
-            endPoint = {x:e.x,y:e.y};
-            var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
-            var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
-            var movedViewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
-            svgImage.setAttribute('viewBox', `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`);
-        }
-        svgRect = svgImage.getBoundingClientRect();
-        let tooltip = document.querySelector('.tooltip')
-        let tooltipRect = tooltip.getBoundingClientRect();
-        document.querySelector('.tooltip').style.left = e.pageX - svgRect.left - ((tooltipRect.right - tooltipRect.left) / 2) + 'px';
-        document.querySelector('.tooltip').style.top = e.pageY - svgRect.top - 40 + 'px';
-    }
-
-    svgContainer.ontouchmove = function(e){
-        svgRect = svgImage.getBoundingClientRect()
-        if (isPanning){
-            endPoint = {x:e.touches[0].screenX - svgRect.left,y:e.touches[0].screenY - svgRect.top};
-            var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
-            var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
-            var movedViewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
-            svgImage.setAttribute('viewBox', `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`);
-            // document.querySelector('.state-answer').innerHTML = `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`
-        }
-        if (isZomming) {
-            endPoint = {x:e.touches[0].screenX - svgRect.left,y:e.touches[0].screenY - svgRect.top};
-            endPoint2 = {x:e.touches[1].screenX - svgRect.left,y:e.touches[1].screenY - svgRect.top};
-            let startDistance = Math.sqrt(Math.pow(startPoint.x - startPoint2.x, 2) + Math.pow(startPoint.y - startPoint2.y, 2));
-            let endDistance =  Math.sqrt(Math.pow(endPoint.x - endPoint2.x, 2) + Math.pow(endPoint.y - endPoint2.y, 2));
-            let delta = endDistance / startDistance - 1;
-
-            startPoint.x = endPoint.x;
-            startPoint.y = endPoint.y;
-            startPoint2.x = endPoint2.x;
-            startPoint2.y = endPoint2.y;
-            var w = viewBox.w;
-            var h = viewBox.h;
-
-            if (((viewBox.w >= maxWidth || viewBox.h >= maxHeight ) && delta < 0) || ((viewBox.w <= minWidth || viewBox.h <= minHeight ) && delta > 0) ) {
-                var dx = 0;
-                var dy = 0;
-                var dw = 0;
-                var dh = 0;
-            } else { 
-                var dw = w*delta;
-                var dh = h*delta;
-                var dx = dw*startX/svgSize.w;
-                var dy = dh*startY/svgSize.h;
-     
-            }
-            scale = svgSize.w/viewBox.w;
-            viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
-            svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
-
-            document.querySelectorAll('circle').forEach( (circle) => {
-                circle.setAttribute('r', ((viewBox.w - minWidth) / (maxWidth - minWidth) * 8) + 6) 
-            })
-
-
-            
-        }
-
-        //document.querySelector('.state-answer').innerHTML = `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`;
-
-        
-    }
-    
-    svgContainer.onmouseup = function(e){
-        if (isPanning){ 
-            endPoint = {x:e.x,y:e.y};
-            var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
-            var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
-            viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
-            svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
-            isPanning = false;
-        }
-    }
-
-    svgContainer.ontouchend = function(e){
-        if (isPanning){ 
-            if (!endPoint.x == 0 && !endPoint.y == 0) {
-                var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
-                var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
-                viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
-                svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
-            }
-            isPanning = false;
-            endPoint.x = 0;
-            endPoint.y = 0;
-        }
-        if (isZomming) {
-            isZomming = false;
-        }
-    }
-    
-    svgContainer.onmouseleave = function(e){
-        if (isPanning){ 
-            endPoint = {x:e.x,y:e.y};
-            var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
-            var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
-            viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
-            svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
-            isPanning = false;
-        }
-    }
+    });   
     
     document.querySelector('.question-container').ontouchstart = (e) => {
         startX = e.touches[0].screenX;
@@ -641,13 +433,185 @@ function gamePage(data, numberOfQuestions) {
             hint = values.hint;
         });
     }
+
+    function addMapNavigationEventListeners() {
+        let svgImage = document.querySelector('.mapSvg');
+        let svgContainer = document.querySelector('.svg-container');
+    
+        svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+        const svgSize = {w:svgImage.clientWidth,h:svgImage.clientHeight};
+        var isPanning = false;
+        let isZomming = false;
+        var startPoint = {x:0,y:0};
+        var endPoint = {x:0,y:0};
+        var scale =  svgSize.w/viewBox.w;
+        let startPoint2 = {x:0,y:0};
+        let endPoint2 = {x:0,y:0}
+        let svgRect = svgImage.getBoundingClientRect();
+        let panningCoeficient = 2;
+        
+        let startX = 0;
+        let startY = 0;
+        document.querySelector('.svg-container').onwheel = function(e) {
+            e.preventDefault();
+            var w = viewBox.w;
+            var h = viewBox.h;
+            var mx = e.offsetX;
+            var my = e.offsetY;  
+    
+            scale = svgSize.w/viewBox.w;
+            
+            if (((viewBox.w >= maxWidth || viewBox.h >= maxHeight ) && e.deltaY > 0) || ((viewBox.w <= minWidth || viewBox.h <= minHeight ) && e.deltaY < 0) ) {
+                var dx = 0;
+                var dy = 0;
+                var dw = 0;
+                var dh = 0;
+            } else { 
+                var dw = w*Math.sign(-e.deltaY)*0.08;
+                var dh = h*Math.sign(-e.deltaY)*0.08;
+                var dx = dw*mx/svgSize.w;
+                var dy = dh*my/svgSize.h;
+     
+            }
+            document.querySelectorAll('circle').forEach( (circle) => {
+                circle.setAttribute('r', ((viewBox.w - minWidth) / (maxWidth - minWidth) * 10) + 4) 
+            })
+    
+            viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
+            svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+        }
+
+        svgContainer.onmousedown = function(e){
+            isPanning = true;
+            startPoint = {x:e.x,y:e.y};  
+        }
+
+        svgContainer.onmousemove = function(e){
+            if (isPanning){
+                endPoint = {x:e.x,y:e.y};
+                var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
+                var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
+                var movedViewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
+                svgImage.setAttribute('viewBox', `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`);
+            }
+            svgRect = svgImage.getBoundingClientRect();
+            let tooltip = document.querySelector('.tooltip')
+            let tooltipRect = tooltip.getBoundingClientRect();
+            document.querySelector('.tooltip').style.left = e.pageX - svgRect.left - ((tooltipRect.right - tooltipRect.left) / 2) + 'px';
+            document.querySelector('.tooltip').style.top = e.pageY - svgRect.top - 40 + 'px';
+        }
+
+        svgContainer.onmouseup = function(e){
+            if (isPanning){ 
+                endPoint = {x:e.x,y:e.y};
+                var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
+                var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
+                viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
+                svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+                isPanning = false;
+            }
+        }
+
+        svgContainer.onmouseleave = function(e){
+            if (isPanning){ 
+                endPoint = {x:e.x,y:e.y};
+                var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
+                var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
+                viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
+                svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+                isPanning = false;
+            }
+        }
+    
+        svgContainer.ontouchstart = function(e){
+            e.preventDefault();
+            
+            svgRect = svgImage.getBoundingClientRect()
+    
+    
+            isPanning = true;
+            startPoint = {x:e.touches[0].screenX - svgRect.left ,y:e.touches[0].screenY - svgRect.top};   
+            
+    
+            if (e.touches[1]) {
+                startPoint2 = {x:e.touches[1].screenX - svgRect.left,y:e.touches[1].screenY - svgRect.top}
+                isZomming = true;
+    
+                startX = (startPoint.x + startPoint2.x ) / 2
+                
+                startY = (startPoint.y + startPoint2.y ) / 2
+               
+            }
+            let tooltip = document.querySelector('.tooltip')
+            let tooltipRect = tooltip.getBoundingClientRect();
+            document.querySelector('.tooltip').style.left = e.touches[0].screenX - svgRect.left - ((tooltipRect.right - tooltipRect.left) / 2) + 'px';
+            document.querySelector('.tooltip').style.top = e.touches[0].screenY - svgRect.top - 80 + 'px';
+        }
+    
+        svgContainer.ontouchmove = function(e){
+            svgRect = svgImage.getBoundingClientRect()
+            if (isPanning){
+                endPoint = {x:e.touches[0].screenX - svgRect.left,y:e.touches[0].screenY - svgRect.top};
+                var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
+                var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
+                var movedViewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
+                svgImage.setAttribute('viewBox', `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`);
+            }
+            if (isZomming) {
+                endPoint = {x:e.touches[0].screenX - svgRect.left,y:e.touches[0].screenY - svgRect.top};
+                endPoint2 = {x:e.touches[1].screenX - svgRect.left,y:e.touches[1].screenY - svgRect.top};
+                let startDistance = Math.sqrt(Math.pow(startPoint.x - startPoint2.x, 2) + Math.pow(startPoint.y - startPoint2.y, 2));
+                let endDistance =  Math.sqrt(Math.pow(endPoint.x - endPoint2.x, 2) + Math.pow(endPoint.y - endPoint2.y, 2));
+                let delta = endDistance / startDistance - 1;
+    
+                startPoint.x = endPoint.x;
+                startPoint.y = endPoint.y;
+                startPoint2.x = endPoint2.x;
+                startPoint2.y = endPoint2.y;
+                var w = viewBox.w;
+                var h = viewBox.h;
+    
+                if (((viewBox.w >= maxWidth || viewBox.h >= maxHeight ) && delta < 0) || ((viewBox.w <= minWidth || viewBox.h <= minHeight ) && delta > 0) ) {
+                    var dx = 0;
+                    var dy = 0;
+                    var dw = 0;
+                    var dh = 0;
+                } else { 
+                    var dw = w*delta;
+                    var dh = h*delta;
+                    var dx = dw*startX/svgSize.w;
+                    var dy = dh*startY/svgSize.h;
+         
+                }
+                scale = svgSize.w/viewBox.w;
+                viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
+                svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+    
+                document.querySelectorAll('circle').forEach( (circle) => {
+                    circle.setAttribute('r', ((viewBox.w - minWidth) / (maxWidth - minWidth) * 8) + 6) 
+                })         
+            }
+        } 
+    
+        svgContainer.ontouchend = function(e){
+            if (isPanning){ 
+                if (!endPoint.x == 0 && !endPoint.y == 0) {
+                    var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
+                    var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
+                    viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
+                    svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+                }
+                isPanning = false;
+                endPoint.x = 0;
+                endPoint.y = 0;
+            }
+            if (isZomming) {
+                isZomming = false;
+            }
+        } 
+    }
 }
 
-
-
-function keyboardHandler(e) {
-  
-}
 
 function submitBtnHandler(parks, parkIterator, correctAnswer, img) {
     let currentPark = parks[parkIterator];
@@ -702,60 +666,14 @@ function showMapBtnHandler() {
 
 }
 
-states = {
-    AZ: {numberOfParks: 0, correctParks: 0, viewBox: {x:145, y:410, w:345, h:207}},
-    AL: {numberOfParks: 0, correctParks: 0, viewBox: {}},
-    AK: {numberOfParks: 0, correctParks: 0, viewBox: {x:16, y:581, w:433, h:260}},
-    AS: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    AR: {numberOfParks: 0, correctParks: 0, viewBox: {x:651, y:399, w:313, h:188}},
-    CA: {numberOfParks: 0, correctParks: 0, viewBox: {x:-162, y:256, w:529, h:317}},
-    CO: {numberOfParks: 0, correctParks: 0, viewBox: {x:320, y:270, w:326, h:197}},
-    CT: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    DC: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    DE: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    FL: {numberOfParks: 0, correctParks: 0, viewBox: {x:866, y:602, w:326, h:196}},
-    GA: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    HI: {numberOfParks: 0, correctParks: 0, viewBox: {x:291, y:591, w:326, h:196}},
-    ID: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    IL: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    IN: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    IA: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    KS: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    KY: {numberOfParks: 0, correctParks: 0, viewBox: {x:819, y:305, w:333, h:200}},
-    LA: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    ME: {numberOfParks: 0, correctParks: 0, viewBox: {x:1224, y:43, w:333, h:200}},
-    MD: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    MA: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    MI: {numberOfParks: 0, correctParks: 0, viewBox: {x:764, y:40, w:441, h:265}},
-    MN: {numberOfParks: 0, correctParks: 0, viewBox: {x:579, y:-7, w:386, h:232}},
-    MS: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    MO: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    MT: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    NE: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    NV: {numberOfParks: 0, correctParks: 0, viewBox: {x:-13, y:255, w:414, h:248}},
-    NH: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    NJ: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    NM: {numberOfParks: 0, correctParks: 0, viewBox: {x:303, y:417, w:320, h:192}},
-    NY: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    NC: {numberOfParks: 0, correctParks: 0, viewBox: {x:972, y:367, w:320, h:192}},
-    ND: {numberOfParks: 0, correctParks: 0, viewBox: {x:456, y:-15, w:322, h:193}},
-    OH: {numberOfParks: 0, correctParks: 0, viewBox: {x:889, y:229, w:331, h:199}},
-    OK: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    OR: {numberOfParks: 0, correctParks: 0, viewBox: {x:-47, y:104, w:331, h:199}},
-    PA: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    RI: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    SC: {numberOfParks: 0, correctParks: 0, viewBox: {x:940, y:433, w:331, h:199}},
-    SD: {numberOfParks: 0, correctParks: 0, viewBox: {x:447, y:79, w:331, h:199}},
-    TN: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    TX: {numberOfParks: 0, correctParks: 0, viewBox: {x:654, y:1207, w:236, h:142}},
-    UT: {numberOfParks: 0, correctParks: 0, viewBox: {x:613, y:1143, w:119, h:72}},
-    VT: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    VI: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    VA: {numberOfParks: 0, correctParks: 0, viewBox: {x:945, y:1174, w:84, h:50}},
-    WA: {numberOfParks: 0, correctParks: 0, viewBox: {x:534, y:1043, w:90, h:54}},
-    WV: {numberOfParks: 0, correctParks: 0, viewBox: {x:943, y:1160, w:82, h:50}},
-    WI: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
-    WY: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}} 
+function toggleImgFullscreen() {
+    if (!document.fullscreenElement) {
+        document.querySelector('.fullscreen-container').requestFullscreen();
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
 }
 
 map = {
