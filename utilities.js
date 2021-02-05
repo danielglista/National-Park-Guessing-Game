@@ -217,7 +217,7 @@ states = {
     SD: {numberOfParks: 0, correctParks: 0, viewBox: {x:447, y:79, w:331, h:199}},
     TN: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
     TX: {numberOfParks: 0, correctParks: 0, viewBox: {x:654, y:1207, w:236, h:142}},
-    UT: {numberOfParks: 0, correctParks: 0, viewBox: {x:613, y:1143, w:119, h:72}},
+    UT: {numberOfParks: 0, correctParks: 0, lat: 39.321000, lon: -111.093700 , viewBox: {x:613, y:1143, w:119, h:72}},
     VT: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
     VI: {numberOfParks: 0, correctParks: 0, viewBox: {x:0, y:0, w:0, h:0}},
     VA: {numberOfParks: 0, correctParks: 0, viewBox: {x:945, y:1174, w:84, h:50}},

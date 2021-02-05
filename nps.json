@@ -8106,7 +8106,64 @@
 
 ,"operatingHours":[{"exceptions":[{"exceptionHours":{"wednesday":"Closed","monday":"Closed","thursday":"Closed","sunday":"Closed","tuesday":"Closed","friday":"Closed","saturday":"Closed"},"startDate":"2021-01-01","name":"New Years Day Holiday","endDate":"2021-01-01"},{"exceptionHours":{"wednesday":"9:00AM - 6:00PM","monday":"9:00AM - 6:00PM","thursday":"9:00AM - 6:00PM","sunday":"9:00AM - 6:00PM","tuesday":"9:00AM - 6:00PM","friday":"9:00AM - 6:00PM","saturday":"9:00AM - 6:00PM"},"startDate":"2021-09-06","name":"Winter Hours, from Labor Day until Memorial Day","endDate":"2022-05-31"},{"exceptionHours":{"wednesday":"Closed","monday":"Closed","thursday":"Closed","sunday":"Closed","tuesday":"Closed","friday":"Closed","saturday":"Closed"},"startDate":"2021-11-26","name":"Thanksgiving Day","endDate":"2021-11-26"},{"exceptionHours":{"wednesday":"Closed","monday":"Closed","thursday":"Closed","sunday":"Closed","tuesday":"Closed","friday":"Closed","saturday":"Closed"},"startDate":"2021-12-25","name":"Christmas Day","endDate":"2021-12-25"}],"description":"The Gateway Arch is open year-round, closed only on Thanksgiving, Christmas, and New Year’s Day. Summer Hours run the Saturday before Memorial Day through Labor Day weekend and are the primary vistor season, if you plan to visit outside of this time please see the exception below.","standardHours":{"wednesday":"8:00AM - 10:00PM","monday":"8:00AM - 10:00PM","thursday":"8:00AM - 10:00PM","sunday":"8:00AM - 10:00PM","tuesday":"8:00AM - 10:00PM","friday":"8:00AM - 10:00PM","saturday":"8:00AM - 10:00PM"},"name":"The Gateway Arch"},{"exceptions":[],"description":"The park grounds are open daily, year round.","standardHours":{"wednesday":"5:00AM - 11:00PM","monday":"5:00AM - 11:00PM","thursday":"5:00AM - 11:00PM","sunday":"5:00AM - 11:00PM","tuesday":"5:00AM - 11:00PM","friday":"5:00AM - 11:00PM","saturday":"5:00AM - 11:00PM"},"name":"Gateway Arch Grounds"},{"exceptions":[{"exceptionHours":{},"startDate":"2021-01-01","name":"New Year's Day","endDate":"2021-01-01"},{"exceptionHours":{"wednesday":"Closed","monday":"Closed","thursday":"Closed","sunday":"Closed","tuesday":"Closed","friday":"Closed","saturday":"Closed"},"startDate":"2021-03-24","name":"Closed due to COVID-19","endDate":"2021-12-31"},{"exceptionHours":{},"startDate":"2021-11-25","name":"Thanksgiving Day","endDate":"2021-11-25"},{"exceptionHours":{},"startDate":"2021-12-25","name":"Christmas Day","endDate":"2021-12-25"}],"description":"The Old Courthouse is open year-round, closed only on Thanksgiving, Christmas, and New Year’s Day.  However, the Old Courthouse is currently closed due to COVID-19, please see exception to the hours below.","standardHours":{"wednesday":"8:00AM - 4:30PM","monday":"8:00AM - 4:30PM","thursday":"8:00AM - 4:30PM","sunday":"8:00AM - 4:30PM","tuesday":"8:00AM - 4:30PM","friday":"8:00AM - 4:30PM","saturday":"8:00AM - 4:30AM"},"name":"Old Courthouse"}]
 ,"addresses":[{"postalCode":"63102","city":"St. Louis","stateCode":"MO","line1":"11. North 4th Street","type":"Physical","line3":"","line2":""},{"postalCode":"63102","city":"St. Louis","stateCode":"MO","line1":"11. North 4th Street","type":"Mailing","line3":"","line2":""}]
-,"images":[{"credit":"NPS Photo/Sue Ford","title":"West Entrance to the Gateway Arch Visitor Center","altText":"West Entrance to the Gateway Arch Visitor Center","caption":"Welcome to the Gateway Arch","url":"https://www.nps.gov/common/uploads/structured_data/51613AEB-9CC1-53CF-90B993791222A9CB.jpg"},{"credit":"NPS Photo/Sue Ford","title":"Gateway Arch","altText":"Gateway Arch","caption":"Over a million people visit the Gateway Arch each year.","url":"https://www.nps.gov/common/uploads/structured_data/3C7BE38B-1DD8-B71B-0BBBE77BE3A2180A.jpg"},{"credit":"NPS photo/Jennifer Clark","title":"The Gateway Arch reflected","altText":"The Gateway Arch reflected in the waters of of the north pond","caption":"A walk around the Gateway Arch grounds provide many chances to view the Arch from many different angles.","url":"https://www.nps.gov/common/uploads/structured_data/348E44EA-F431-FA18-DCB014F7BAA8D225.jpg"},{"credit":"NPS Photo/Sue Ford","title":"Gateway Arch at Sunrise","altText":"Gateway Arch at Sunrise","caption":"The sunrise coming up behind the Gateway Arch.","url":"https://www.nps.gov/common/uploads/structured_data/3C7BD9B5-1DD8-B71B-0B598216CE4E46D0.jpg"},{"credit":"NPS Photo/Sue Ford","title":"Reaching for the Clouds","altText":"Arch and clouds","caption":"Arch reaching toward the clouds.","url":"https://www.nps.gov/common/uploads/structured_data/3C7BE538-1DD8-B71B-0BFF11B2DBCF6E6E.jpg"},{"credit":"NPS photo/Jennifer Clark","title":"Old Courthouse","altText":"Dred and Harriet Scott statue in front of the columns of the Old Courthouse in the morning light","caption":"The Old Courthouse","url":"https://www.nps.gov/common/uploads/structured_data/347D5E5B-B4B0-917D-A3F2C03D113E911E.jpg"},{"credit":"NPS photo/Jennifer Clark","title":"The Old Courthouse","altText":"looking across the green lawn in Smith Square to the Old Courthouse","caption":"The Old Courthouse","url":"https://www.nps.gov/common/uploads/structured_data/34E649C6-F06F-EB7F-0F9B8B092450772F.jpg"},{"credit":"NPS photo/Jennifer Clark","title":"Cherry trees in bloom","altText":"The Gateway Arch and Old Courthouse with a row of pink blooming cherry trees in front","caption":"The blooming cherry trees in Kiener Plaza provide a wonderful foreground for the Gateway Arch and Old Courthouse in spring.","url":"https://www.nps.gov/common/uploads/structured_data/34B0AD15-F1FB-85BC-36202E5A42E2AD16.jpg"}]
+, "images": [
+    {
+        "credit": "NPS Photo/Sue Ford",
+        "title": "West Entrance to the Gateway Arch Visitor Center",
+        "altText": "West Entrance to the Gateway Arch Visitor Center",
+        "caption": "Welcome to the Gateway Arch",
+        "url": "https://www.nps.gov/common/uploads/structured_data/51613AEB-9CC1-53CF-90B993791222A9CB.jpg"
+    },
+    {
+        "credit": "NPS Photo/Sue Ford",
+        "title": "Gateway Arch",
+        "altText": "Gateway Arch",
+        "caption": "Over a million people visit the Gateway Arch each year.",
+        "url": "https://www.nps.gov/common/uploads/structured_data/3C7BE38B-1DD8-B71B-0BBBE77BE3A2180A.jpg"
+    },
+    {
+        "credit": "NPS photo/Jennifer Clark",
+        "title": "The Gateway Arch reflected",
+        "altText": "The Gateway Arch reflected in the waters of of the north pond",
+        "caption": "A walk around the Gateway Arch grounds provide many chances to view the Arch from many different angles.",
+        "url": "https://www.nps.gov/common/uploads/structured_data/348E44EA-F431-FA18-DCB014F7BAA8D225.jpg"
+    },
+    {
+        "credit": "NPS Photo/Sue Ford",
+        "title": "Gateway Arch at Sunrise",
+        "altText": "Gateway Arch at Sunrise",
+        "caption": "The sunrise coming up behind the Gateway Arch.",
+        "url": "https://www.nps.gov/common/uploads/structured_data/3C7BD9B5-1DD8-B71B-0B598216CE4E46D0.jpg"
+    },
+    {
+        "credit": "NPS Photo/Sue Ford",
+        "title": "Reaching for the Clouds",
+        "altText": "Arch and clouds",
+        "caption": "Arch reaching toward the clouds.",
+        "url": "https://www.nps.gov/common/uploads/structured_data/3C7BE538-1DD8-B71B-0BFF11B2DBCF6E6E.jpg"
+    },
+    {
+        "credit": "NPS photo/Jennifer Clark",
+        "title": "Old Courthouse",
+        "altText": "Dred and Harriet Scott statue in front of the columns of the Old Courthouse in the morning light",
+        "caption": "The Old Courthouse",
+        "url": "https://www.nps.gov/common/uploads/structured_data/347D5E5B-B4B0-917D-A3F2C03D113E911E.jpg"
+    },
+    {
+        "credit": "NPS photo/Jennifer Clark",
+        "title": "The Old Courthouse",
+        "altText": "looking across the green lawn in Smith Square to the Old Courthouse",
+        "caption": "The Old Courthouse",
+        "url": "https://www.nps.gov/common/uploads/structured_data/34E649C6-F06F-EB7F-0F9B8B092450772F.jpg"
+    },
+    {
+        "credit": "NPS photo/Jennifer Clark",
+        "title": "Cherry trees in bloom",
+        "altText": "The Gateway Arch and Old Courthouse with a row of pink blooming cherry trees in front",
+        "caption": "The blooming cherry trees in Kiener Plaza provide a wonderful foreground for the Gateway Arch and Old Courthouse in spring.",
+        "url": "https://www.nps.gov/common/uploads/structured_data/34B0AD15-F1FB-85BC-36202E5A42E2AD16.jpg"
+    }
+]
 ,"weatherInfo":"Normal Daily Mean Temperature (in degrees Fahrenheit)* January - 29.3 February - 33.9 March - 45.1 April - 56.7 May - 66.1 June - 75.4 July - 79.8 August - 77.6 September - 70.2 October - 58.4 November - 46.2 December - 33.9 Average Percent of Days with Sunshine* January - 50% February - 52% March - 54% April - 56% May - 59% June - 66% July - 68% August - 65% September - 63% October - 60% November - 46% December - 53% *Source: National Oceanic and Atmospheric Administration"
 
 ,"name":"Gateway Arch"

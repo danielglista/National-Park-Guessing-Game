@@ -69,21 +69,43 @@ function displayQuestion() {
     startTime = performance.now();
 }
 
-function renderScoreBreakdownTable(correctStates) {
+function renderScoreBreakdownTable(correctStates, park) {
     const userAnswer = getStateTwoDigitCode(document.querySelector('.text-input').value);
 
     const tbody = document.querySelector('.score-breakdown-table tbody');
 
-    let answerMultiplier = 0;
+    let answerPoints = 0;
+    let answerMessage = '';
     let hintMultiplier = 0;
     let timeMultiplier = 1;
     let total = 0;
 
+
     if (userAnswer == correctStates[0]) {
-        answerMultiplier = 1.0;
+        answerPoints = 100;
+        answerMessage = 'Correct';
     } else {
-        answerMultiplier = 0.0;
+        // Formula found from https://www.movable-type.co.uk/scripts/latlong.html
+        const R = 6371e3; // metres
+        const φ1 = states['UT'].lat * Math.PI/180; // φ, λ in radians
+        const φ2 = park.latitude * Math.PI/180;
+        const Δφ = (park.latitude-states['UT'].lat) * Math.PI/180;
+        const Δλ = (park.longitude-states['UT'].lon) * Math.PI/180;
+
+        const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+        d = R * c * 0.000621371192; // in miles
+        let answerMultiplier = 0.75 * (1 - d/1000);
+
+        answerMultiplier = Math.min(answerMultiplier, 0.5);
+        answerMultiplier = Math.max(answerMultiplier, 0);
+        answerPoints = Math.round(100 * answerMultiplier);
+
+        answerMessage = Math.round(d) + ' Miles';
     }
+
+    
 
     switch(hint) {
         case 0:
@@ -109,15 +131,15 @@ function renderScoreBreakdownTable(correctStates) {
     timeMultiplier = Math.max(timeMultiplier, 1.0);
 
 
-    total = Math.round(100 * answerMultiplier * hintMultiplier * timeMultiplier);
+    total = Math.round(100 * answerPoints * hintMultiplier * timeMultiplier);
 
 
 
     tbody.innerHTML = `
         <tr>
             <td>Answer</td>
-            <td class=''><100 miles</td>
-            <td class=''><p>50</p></td>
+            <td class=''>${answerMessage}</td>
+            <td class=''>${answerPoints}</td>
         </tr>
         <tr>
             <td>Hints</td>
@@ -205,7 +227,7 @@ function renderAnswer(correctAnswer, park) {
     }
     document.querySelector('.state-answer').innerHTML = stateNamesString + ' - ' + park.name;
 
-    renderScoreBreakdownTable(correctStates);
+    renderScoreBreakdownTable(correctStates, park);
 }
 
 
@@ -298,6 +320,7 @@ function gamePage(data, numberOfQuestions) {
     addButtonEventListeners();
     addMapNavigationEventListeners();
     addTouchSlideEventListeners();
+    addUtilityEventListeners();
    
 
     randomIndex = Math.floor(Math.random() * Object.keys(parks[parkIterator].images).length);
@@ -635,6 +658,7 @@ function submitBtnHandler(parks, parkIterator, correctAnswer, img) {
         }, wipeTransitionTime );
     } else {
         // Map is currently displayed
+        displayAnswer();
         renderQuestion(nextPark, img);
     }
 
