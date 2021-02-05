@@ -77,6 +77,7 @@ function renderScoreBreakdownTable(correctStates, park) {
     let answerPoints = 0;
     let answerMessage = '';
     let hintMultiplier = 0;
+    let numberOfHints = 0;
     let timeMultiplier = 1;
     let total = 0;
 
@@ -109,13 +110,15 @@ function renderScoreBreakdownTable(correctStates, park) {
 
     switch(hint) {
         case 0:
-            hintMultiplier = 1.25;
+            hintMultiplier = 1.5;
             break;
         case 1:
-            hintMultiplier = 1.0;
+            hintMultiplier = 1.25;
+            numberOfHints  = 1;
             break;
         case 2:
-            hintMultiplier = 0.75;
+            hintMultiplier = 1;
+            numberOfHints = 2;
             break;
     }
 
@@ -124,14 +127,14 @@ function renderScoreBreakdownTable(correctStates, park) {
 
     let seconds = Math.round(elapsedTime);
     
-    timeMultiplier = 2.25 * Math.abs(1 - (seconds / 60));
+    timeMultiplier = 1.67 * Math.abs(1 - (seconds / 80))
     timeMultiplier = Math.round(timeMultiplier * 100) / 100;
 
-    timeMultiplier = Math.min(timeMultiplier, 1.6);
+    timeMultiplier = Math.min(timeMultiplier, 1.5);
     timeMultiplier = Math.max(timeMultiplier, 1.0);
 
 
-    total = Math.round(100 * answerPoints * hintMultiplier * timeMultiplier);
+    total = Math.round(answerPoints * hintMultiplier * timeMultiplier);
 
 
 
@@ -143,12 +146,12 @@ function renderScoreBreakdownTable(correctStates, park) {
         </tr>
         <tr>
             <td>Hints</td>
-            <td class=''>0 Hints</td>
+            <td class=''>${numberOfHints} Hints</td>
             <td>x${hintMultiplier}</td>
         </tr>
         <tr>
             <td>Time</td>
-            <td class=''>5 Seconds</td>
+            <td class=''>${seconds} Seconds</td>
             <td class=''>x${timeMultiplier}</td>
         </tr>
         <tr>
