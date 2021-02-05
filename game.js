@@ -87,10 +87,10 @@ function renderScoreBreakdownTable(correctStates, park) {
     } else {
         // Formula found from https://www.movable-type.co.uk/scripts/latlong.html
         const R = 6371e3; // metres
-        const φ1 = states['UT'].lat * Math.PI/180; // φ, λ in radians
+        const φ1 = states[userAnswer].lat * Math.PI/180; // φ, λ in radians
         const φ2 = park.latitude * Math.PI/180;
-        const Δφ = (park.latitude-states['UT'].lat) * Math.PI/180;
-        const Δλ = (park.longitude-states['UT'].lon) * Math.PI/180;
+        const Δφ = (park.latitude-states[userAnswer].lat) * Math.PI/180;
+        const Δλ = (park.longitude-states[userAnswer].lon) * Math.PI/180;
 
         const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
