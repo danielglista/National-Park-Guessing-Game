@@ -387,7 +387,7 @@ function renderGamePage() {
             </datalist>
 
             <input class='btn btn-amber-outline btn-submit' type="button" value='Submit' />
-            <input class='btn btn-green-outline btn-showmap' type='button' value='Show Map' />
+            <input class='btn btn-green-outline btn-map-toggle' type='button' value='Map' />
         </div>
         
         <input class='btn btn-green-outline btn-hint' type="button" value='Hint' />
@@ -407,8 +407,8 @@ function renderResultsPage() {
                     <tbody>
                         <tr>
                             <td>Total</td>
-                            <td>${(document.querySelector('.score').innerHTML)}/${document.querySelector('.question-total').innerHTML}</td>
-                            <td>${Math.floor(parseInt(document.querySelector('.score').innerHTML)/parseInt(document.querySelector('.question-total').innerHTML)*100)}%</td>
+                            <td>${totalCorrectAnswers}/${document.querySelector('.question-total').innerHTML}</td>
+                            <td>${totalCorrectAnswers/parseInt(document.querySelector('.question-total').innerHTML)*100}%</td>
                         </tr>
     `;
 

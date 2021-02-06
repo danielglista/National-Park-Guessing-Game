@@ -72,8 +72,12 @@ body {
     overflow: hidden;
 }
 
-.width-transition {
+.width-transition-short {
     transition: width 0.3s;
+}
+
+.width-transition-long {
+    transition: width 0.5s linear;
 }
 
 .question-mask.no-transitions, .answer-mask.no-transitions {
@@ -184,7 +188,7 @@ path:hover {
     justify-content: space-between;
 }
 
-.tutorial-mask {
+/* .tutorial-mask {
     position: absolute;
     bottom: 0;
     width: 6px;
@@ -215,7 +219,7 @@ path:hover {
     padding-bottom: 1rem;
     opacity: 0;
     transition: opacity 3s linear;
-}
+} */
 
 
 
@@ -487,10 +491,6 @@ input[type=range] {
         width: 400px;
     }
 
-    .question-mask, .answer-mask {
-        transition: width 0.8s linear;
-    }
-
 }
 
 @media (min-width: 648px) and (max-width: 991px) {
@@ -531,6 +531,12 @@ input[type=range] {
 
     .fa-expand {
         visibility: visible;
+    }
+}
+
+@media (pointer: coarse) {
+    .btn-map-toggle {
+        display: none;
     }
 }
 

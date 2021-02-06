@@ -1,14 +1,16 @@
-let debug = 0.8; // To be fixed in next release
-const wipeTransitionTime = 1000*debug; // in milliseconds
+const transitionTimeLong = 500; // in milliseconds
+const transitionTimeShort = 300; // in milliseconds
 let viewBox = {x:593,y:861,w:354,h:399}; // to be moved into gamePage.js
 const maxWidth = 951;
 const minWidth = 48;
 const maxHeight = 1000;
 const minHeight = 50;
-let hint = 0;
 let startTime = 0;
 let stopTime = 0;
-let correctAnswer = '';
+let hint = 0;
+let streak = 0;
+let totalCorrectAnswers = 0;
+
 
 
 function showTooltip(e) {
@@ -50,19 +52,26 @@ function renderQuestion(park, img, hint=0) {
 
 function displayQuestion() {
     document.querySelector('.btn-next').classList.add('disabled');
+    document.querySelector('.btn-map-toggle').classList.remove('disabled')
     document.querySelector('.btn-next').blur();
     document.querySelector('.question-counter').innerHTML = parseInt(document.querySelector('.question-counter').innerHTML) + 1;
-
-    document.querySelector('.answer-mask').style.width = 0;
     document.querySelector('.text-input').value = '';
+    document.querySelector('.btn-map-toggle').value = 'Map';
 
+    document.querySelector('.answer-mask').classList.add('width-transition-long');
+    setTimeout(() => {
+        document.querySelector('.answer-mask').style.width = 0; 
+    }, 0);
 
     setTimeout( () => {
         document.querySelector('.answer-mask').style.zIndex = 5;
         document.querySelector('.question-mask').style.zIndex = 10;
-        document.querySelector('.answer-mask').style.width = '100%';
+        document.querySelector('.answer-mask').classList.add('width-transition-long');
         document.querySelector('.btn-submit').classList.remove('disabled');
-    }, wipeTransitionTime)
+        setTimeout(() => {
+            document.querySelector('.answer-mask').style.width = '100%';
+        }, 0);
+    }, transitionTimeLong)
 
     document.querySelector('.score').innerHTML = document.querySelector('.score').getAttribute('data-score');
 
@@ -79,10 +88,11 @@ function renderScoreBreakdownTable(correctStates, park) {
     let hintMultiplier = 0;
     let numberOfHints = 0;
     let timeMultiplier = 1;
+    let streakMultiplier = 0;
     let total = 0;
 
 
-    if (userAnswer == correctStates[0]) {
+    if (correctStates.find(i => i == userAnswer)) {
         answerPoints = 100;
         answerMessage = 'Correct';
     } else {
@@ -105,8 +115,6 @@ function renderScoreBreakdownTable(correctStates, park) {
 
         answerMessage = Math.round(d) + ' Miles';
     }
-
-    
 
     switch(hint) {
         case 0:
@@ -133,9 +141,12 @@ function renderScoreBreakdownTable(correctStates, park) {
     timeMultiplier = Math.min(timeMultiplier, 1.5);
     timeMultiplier = Math.max(timeMultiplier, 1.0);
 
+    streakMultiplier = Math.abs(0.834 + (streak / 12))
+    streakMultiplier = Math.round(streakMultiplier * 100) / 100;
+    streakMultiplier = Math.min(streakMultiplier, 1.5);
+    streakMultiplier = Math.max(streakMultiplier, 1.0);
 
-    total = Math.round(answerPoints * hintMultiplier * timeMultiplier);
-
+    total = Math.round(answerPoints * hintMultiplier * timeMultiplier * streakMultiplier);
 
 
     tbody.innerHTML = `
@@ -156,8 +167,8 @@ function renderScoreBreakdownTable(correctStates, park) {
         </tr>
         <tr>
             <td>Streak</td>
-            <td>7x</td>
-            <td>x1.3</td>
+            <td>${streak}x</td>
+            <td>x${streakMultiplier}</td>
         </tr>
         <tr>
             <td>Total</td>
@@ -171,26 +182,31 @@ function renderScoreBreakdownTable(correctStates, park) {
 
 function resetScorBreakdownTable() {
     document.querySelector('.score-breakdown-table tbody').innerHTML = `
-    <tr>
-        <td>Base</td>
-        <td>100</td>
-    </tr>
-    <tr>
-        <td>Answer</td>
-        <td>???</td>
-    </tr>
-    <tr>
-        <td>Hints</td>
-        <td>???</td>
-    </tr>
-    <tr>
-        <td>Time</td>
-        <td>???</td>
-    </tr>
-    <tr>
-        <td>Total</td>
-        <td>???</td>
-    </tr>
+        <tr>
+            <td>Answer</td>
+            <td class=''>???</td>
+            <td class=''>???</td>
+        </tr>
+        <tr>
+            <td>Hints</td>
+            <td class=''>???</td>
+            <td>???</td>
+        </tr>
+        <tr>
+            <td>Time</td>
+            <td class=''>???</td>
+            <td class=''>???</td>
+        </tr>
+        <tr>
+            <td>Streak</td>
+            <td>???</td>
+            <td>???</td>
+        </tr>
+        <tr>
+            <td>Total</td>
+            <td></td>
+            <td>???</td>
+        </tr>
     `;
 }
 
@@ -199,6 +215,7 @@ function renderAnswer(correctAnswer, park) {
     let correctStates = correctAnswer.split(',');
     let stateNamesString = '';
     for (let i in correctStates) {
+        console.log(correctStates[i])
         states[correctStates[i]].numberOfParks++;
         if (i > 0) {
             stateNamesString += ', ';
@@ -220,6 +237,8 @@ function renderAnswer(correctAnswer, park) {
             states[i].correctParks++;
         }
         document.querySelector('.mapSvg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y}' r='15' fill='#33ff00' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
+        streak += 1;
+        totalCorrectAnswers += 1;
     } else {
         document.querySelector('.answer-container').className = document.querySelector('.answer-container').className.replace('green', 'red');
         // document.querySelector('.answer-container i').className = 'fas fa-times fa-9x';
@@ -227,6 +246,7 @@ function renderAnswer(correctAnswer, park) {
         document.querySelector('.answer-container input').classList.add('btn-red-outline');
         document.querySelector('.answer-container input').classList.remove('btn-green-outline');
         document.querySelector('.mapSvg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y}' r='15' fill='#ff4000' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
+        streak = 0;
     }
     document.querySelector('.state-answer').innerHTML = stateNamesString + ' - ' + park.name;
 
@@ -235,20 +255,23 @@ function renderAnswer(correctAnswer, park) {
 
 
 function displayAnswer() {
-    document.querySelector('.question-mask').style.width = 0;
+    document.querySelector('.question-mask').classList.add('width-transition-long');
+    setTimeout(() => {
+        document.querySelector('.question-mask').style.width = 0;
+    }, 0);
     document.querySelector('.btn-submit').classList.add('disabled');
     document.querySelector('.btn-submit').blur();
+    document.querySelector('.btn-map-toggle').classList.add('disabled')
 
     setTimeout( () => {
         document.querySelector('.question-mask').style.zIndex = 5;
         document.querySelector('.answer-mask').style.zIndex = 10;
-        document.querySelector('.question-mask').classList.add('no-transitions');
-        document.querySelector('.question-mask').style.width = '100%';
+        document.querySelector('.question-mask').classList.remove('width-transition-long');
+        document.querySelector('.btn-next').classList.remove('disabled');
         setTimeout( () => {
-            document.querySelector('.btn-next').classList.remove('disabled');
-            document.querySelector('.question-mask').classList.remove('no-transitions');
-        }, 10);
-    }, wipeTransitionTime)
+            document.querySelector('.question-mask').style.width = '100%';
+        }, 0);
+    }, transitionTimeLong)
 
  
 }
@@ -335,6 +358,7 @@ function gamePage(data, numberOfQuestions) {
     img.src = parks[parkIterator + 1].images[randomIndex].url;
 
 
+    startTime = performance.now();
 
     function addButtonEventListeners() {
         document.addEventListener('keyup', (e) => {
@@ -377,6 +401,10 @@ function gamePage(data, numberOfQuestions) {
             const values = hintBtnHander(parks[parkIterator], hint);
             hint = values.hint;
         });
+
+        document.querySelector('.btn-map-toggle').addEventListener('click', () => {
+            mapToggleHandler();
+        })
     }
 
     function addMapNavigationEventListeners() {
@@ -579,7 +607,7 @@ function gamePage(data, numberOfQuestions) {
             endX = 0;
            
             if (document.querySelector('.question-mask').offsetWidth < document.querySelector('.card').offsetWidth * 0.7 ) {
-                document.querySelector('.question-mask').classList.add('width-transition')
+                document.querySelector('.question-mask').classList.add('width-transition-short')
                 document.querySelector('.question-mask').style.width = '0px';
                 if (parseInt(document.querySelector('.question-counter').innerHTML)) {
                     setTimeout( () => {
@@ -587,7 +615,7 @@ function gamePage(data, numberOfQuestions) {
                     }, 3000);
                 }
             } else {
-                document.querySelector('.question-mask').classList.add('width-transition')
+                document.querySelector('.question-mask').classList.add('width-transition-short')
                 document.querySelector('.question-mask').style.width = '100%';
             }
     
@@ -602,7 +630,7 @@ function gamePage(data, numberOfQuestions) {
         document.querySelector('.answer-container').ontouchstart = (e) => {
             if (e.srcElement !== svgImage && e.srcElement.parentElement.parentElement !== svgImage) {
                 startX = e.touches[0].screenX;
-                document.querySelector('.question-mask').classList.remove('width-transition')
+                document.querySelector('.question-mask').classList.remove('width-transition-short')
             }
         } 
         document.querySelector('.answer-container').ontouchmove = (e) => {
@@ -619,10 +647,10 @@ function gamePage(data, numberOfQuestions) {
                 startX = 0;
                 endX = 0;
                 if (document.querySelector('.question-mask').offsetWidth < (document.querySelector('.card').offsetWidth) * 0.3 ) {
-                    document.querySelector('.question-mask').classList.add('width-transition')
+                    document.querySelector('.question-mask').classList.add('width-transition-short')
                     document.querySelector('.question-mask').style.width = '0px';
                 } else {
-                    document.querySelector('.question-mask').classList.add('width-transition')
+                    document.querySelector('.question-mask').classList.add('width-transition-short')
                     document.querySelector('.question-mask').style.width = '100%';
                 }
             }
@@ -658,7 +686,7 @@ function submitBtnHandler(parks, parkIterator, correctAnswer, img) {
         displayAnswer();
         setTimeout(() => {
             renderQuestion(nextPark, img);
-        }, wipeTransitionTime );
+        }, transitionTimeLong );
     } else {
         // Map is currently displayed
         displayAnswer();
@@ -698,8 +726,26 @@ function hintBtnHander(park, hint) {
     }
 }
 
-function showMapBtnHandler() {
-
+function mapToggleHandler() {
+    document.querySelector('.btn-map-toggle').blur();
+    document.querySelector('.btn-map-toggle').classList.add('disabled');
+    if (parseInt(document.querySelector('.question-mask').offsetWidth) > 0) {
+        document.querySelector('.question-mask').classList.add('width-transition-long')
+        setTimeout(() => {
+            document.querySelector('.question-mask').style.width = '0px';
+        }, 0);
+        document.querySelector('.btn-map-toggle').value = 'Question';
+    } else {
+        document.querySelector('.question-mask').classList.add('width-transition-long')
+        setTimeout(() => {
+            document.querySelector('.question-mask').style.width = '100%';
+        }, 0);
+        document.querySelector('.btn-map-toggle').value = 'Map';
+    }
+    setTimeout( () => {
+        document.querySelector('.question-mask').classList.remove('width-transition-long')
+        document.querySelector('.btn-map-toggle').classList.remove('disabled');
+    }, transitionTimeLong)
 }
 
 function toggleImgFullscreen() {
