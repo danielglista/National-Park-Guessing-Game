@@ -161,9 +161,14 @@ img.fullscreen {
     max-height: 200px;
 }
 
-path:hover {
+path:not(.selected):hover {
    fill: var(--amber) !important;
-   fill-opacity: 1 !important;
+   fill-opacity: 0.7 !important;
+}
+
+path.selected {
+    fill: var(--amber) !important;
+    fill-opacity: 1 !important;
 }
 
 .tooltip {

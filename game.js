@@ -278,6 +278,13 @@ function displayAnswer() {
 
 function pathClickHandler(path) {
     document.querySelector('.text-input').value = path.getAttribute('title');
+    try {
+        document.querySelector('path.selected').classList.remove('selected');
+    } catch (error) {
+        
+    } finally {
+        path.classList.add('selected');
+    }
 }
 
 function displayTutorial(tutorial) {
