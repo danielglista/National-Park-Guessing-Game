@@ -1,6 +1,6 @@
 const transitionTimeLong = 500; // in milliseconds
 const transitionTimeShort = 300; // in milliseconds
-let viewBox = {x:593,y:861,w:354,h:399}; // to be moved into gamePage.js
+let viewBox = {x:593,y:861,w:354,h:399};
 const maxWidth = 951;
 const minWidth = 48;
 const maxHeight = 1000;
@@ -10,6 +10,8 @@ let stopTime = 0;
 let hint = 0;
 let streak = 0;
 let totalCorrectAnswers = 0;
+const circleConstant = 20;
+const viewBoxStart = {x:593,y:861,w:354,h:399};
 
 
 
@@ -236,7 +238,7 @@ function renderAnswer(correctAnswer, park) {
         for (let i of correctStates) {
             states[i].correctParks++;
         }
-        document.querySelector('.mapSvg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y}' r='15' fill='#33ff00' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
+        document.querySelector('.mapSvg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y}' r='${circleConstant / (viewBoxStart.w / viewBox.w)}' fill='#33ff00' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
         streak += 1;
         totalCorrectAnswers += 1;
     } else {
@@ -245,7 +247,7 @@ function renderAnswer(correctAnswer, park) {
         // document.querySelector('.answer-container h1').innerHTML = '';
         document.querySelector('.answer-container input').classList.add('btn-red-outline');
         document.querySelector('.answer-container input').classList.remove('btn-green-outline');
-        document.querySelector('.mapSvg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y}' r='15' fill='#ff4000' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
+        document.querySelector('.mapSvg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y}' r='${circleConstant / (viewBoxStart.w / viewBox.w)}' fill='#ff4000' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
         streak = 0;
     }
     document.querySelector('.state-answer').innerHTML = stateNamesString + ' - ' + park.name;
@@ -432,6 +434,29 @@ function gamePage(data, numberOfQuestions) {
         
         let startX = 0;
         let startY = 0;
+
+        function findIntersectingNodes(node) {
+            let children = [];
+            let chain = [];
+          
+            node.indexed = true;
+        
+            for (let i in field) {
+              if (field[i].x === node.x && field[i] !== node && field[i].indexed === false) {
+                children.push(field[i])
+                field[i].indexed = true;
+              }
+            }
+        
+            if (children.length > 0) {
+              for (let i in children) {
+                chain.push(findIntersectingNodes(children[i]));
+              }
+            }
+            chain.push(node)
+            return chain;
+        }
+
         document.querySelector('.svg-container').onwheel = function(e) {
             e.preventDefault();
             var w = viewBox.w;
@@ -453,12 +478,14 @@ function gamePage(data, numberOfQuestions) {
                 var dy = dh*my/svgSize.h;
      
             }
-            document.querySelectorAll('circle').forEach( (circle) => {
-                circle.setAttribute('r', ((viewBox.w - minWidth) / (maxWidth - minWidth) * 10) + 4) 
-            })
+
     
             viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
             svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+
+            document.querySelectorAll('circle').forEach( (circle) => {
+                circle.setAttribute('r', circleConstant / (viewBoxStart.w / viewBox.w)) 
+            })
         }
 
         svgContainer.onmousedown = function(e){
@@ -568,7 +595,7 @@ function gamePage(data, numberOfQuestions) {
                 svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
     
                 document.querySelectorAll('circle').forEach( (circle) => {
-                    circle.setAttribute('r', ((viewBox.w - minWidth) / (maxWidth - minWidth) * 8) + 6) 
+                    circle.setAttribute('r', circleConstant / (viewBoxStart.w / viewBox.w))
                 })         
             }
         } 
