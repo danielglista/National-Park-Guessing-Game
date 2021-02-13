@@ -118,7 +118,6 @@ function renderAnswer(correctAnswer, park) {
     let correctStates = correctAnswer.split(',');
     let stateNamesString = '';
     for (let i in correctStates) {
-        console.log(correctStates[i])
         states[correctStates[i]].numberOfParks++;
         if (i > 0) {
             stateNamesString += ', ';
@@ -169,7 +168,7 @@ function renderAnswer(correctAnswer, park) {
 
         // Add node to mapNodes object
         let node = {
-            park: park.name,
+            parkName: park.name,
             x: cord.x,
             y: cord.y,
             indexed: false
@@ -465,6 +464,7 @@ function gamePage(data, numberOfQuestions) {
         let startY = 0;
 
         let currentRadius = 0;
+        
 
         function findIntersectingNodes(node) {
             let children = [];
@@ -473,26 +473,77 @@ function gamePage(data, numberOfQuestions) {
             node.indexed = true;
         
             for (let i in mapNodes) {
+                
                 if (!mapNodes[i].indexed) {
-                    console.log(mapNodes[i])
+                    let overlap = !(node.x + currentRadius < mapNodes[i].x - currentRadius || node.x - currentRadius > mapNodes[i].x + currentRadius || node.y + currentRadius < mapNodes[i].y - currentRadius || node.y - currentRadius > mapNodes[i].y + currentRadius);
+                    if (overlap) {
+                        children.push(mapNodes[i])
+                        mapNodes[i].indexed = true;
+                    }
                 }
-            //     var overlap = !(node.x + r < mapNodes[i].x - r || 
-            //         node.left > mapNodes[i].right || 
-            //         node.bottom < mapNodes[i].top || 
-            //         node.top > mapNodes[i].bottom)
-            //   if (overlap && mapNodes[i] !== node && mapNodes[i].indexed === false) {
-            //     children.push(mapNodes[i])
-            //     mapNodes[i].indexed = true;
-            //   }
+                
             }
         
             if (children.length > 0) {
               for (let i in children) {
-                chain.push(findIntersectingNodes(children[i]));
+                let subChain = findIntersectingNodes(children[i]);
+                for (let j in subChain) {
+                    chain.push(subChain[j]);
+                }
               }
             }
             chain.push(node)
             return chain;
+        }
+
+        function addChainNode(chain) {
+
+            let averageX = 0;
+            let averageY = 0;
+            let parkNames = '';
+
+            for(let node of chain) {
+                averageX += node.x;
+                averageY += node.y;
+                parkNames += node.parkName + ','
+            }
+
+            averageX /= chain.length;
+            averageY /= chain.length;
+
+            document.querySelector('.mapSvg').innerHTML += `
+                <g class='chainNode' parkNames='${parkNames}'>
+                    <circle cx='${averageX}' cy='${averageY}' r='${circleConstant / (viewBoxStart.w / viewBox.w)}' fill='#282828' stroke='#00ff33' stroke-width='2' /> 
+                    <text x='${averageX}' y='${averageY}' text-anchor='middle' fill='white' font-size='4rem' font-family='Arial' dy=".3em">${chain.length}</text>
+                </g>
+            `;
+        }
+
+        function removeChainNode(chain) {
+            try {
+                document.querySelector(`.chainNode[parkNames*='${chain[0].parkName}']`).remove();
+            } catch (err) {
+
+            }
+        }
+
+        function updateChainNode(chain) {
+            try {
+                let query = "";
+                for (let i in chain) {
+                    query += `.chainNode[parkNames*='${chain[i].parkName}']`;
+                    if (i < chain.length - 1) {
+                        query += ',';
+                    }
+                }
+                console.log(query)
+                const chainNode = document.querySelector(query);
+                const cirlce = chainNode.querySelector('circle');
+                const text = chainNode.querySelector('text');
+                text.innerHTML = chain.length;
+            } catch (err) {
+                console.log(err)
+            }
         }
 
         document.querySelector('.svg-container').onwheel = function(e) {
@@ -527,8 +578,39 @@ function gamePage(data, numberOfQuestions) {
                 circle.setAttribute('r', circleConstant / (viewBoxStart.w / viewBox.w)) 
             })
 
-            currentRadius = document.querySelector('circle').getAttribute('r');
-            console.log(findIntersectingNodes(mapNodes[0]));
+            currentRadius = parseInt(document.querySelector('circle').getAttribute('r'));
+            for (let node of mapNodes) {
+               node.indexed = false;
+            }
+            let chains = [];
+            for (let node of mapNodes) {
+                if (!node.indexed) {
+                    chains.push(findIntersectingNodes(node));
+                }
+            }
+            for (let chain of chains) {
+                if (chain.length > 1) {
+                    let totalVisibility = true;
+                    let partialVisibility = false;
+                    let previousNodeVisibility = 0;
+                    for (let node of chain) {
+                        if (document.querySelector(`[parkname='${node.parkName}']`).style.visibility == 'hidden') {
+                            totalVisibility = false;
+                            previousNodeVisibility === true ? partialVisibility = true : null;
+                            previousNodeVisibility = false;
+                        } else {
+                            previousNodeVisibility === false ? partialVisibility = true : null;
+                            previousNodeVisibility = true;
+                        }
+                        document.querySelector(`[parkname='${node.parkName}']`).style.visibility = 'hidden';
+                    }
+                    if (totalVisibility) {addChainNode(chain)}
+                    if (partialVisibility) {updateChainNode(chain)}
+                } else {
+                    if (document.querySelector(`[parkname='${chain[0].parkName}']`).style.visibility == 'hidden') {removeChainNode(chain)}
+                    document.querySelector(`[parkname='${chain[0].parkName}']`).style.visibility = 'visible';
+                }
+            }
         }
 
         svgContainer.onmousedown = function(e){
