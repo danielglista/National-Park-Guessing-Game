@@ -12,6 +12,7 @@ let streak = 0;
 let totalCorrectAnswers = 0;
 const circleConstant = 20;
 const viewBoxStart = {x:593,y:861,w:354,h:399};
+let mapNodes = [];
 
 
 
@@ -80,107 +81,7 @@ function displayQuestion() {
     startTime = performance.now();
 }
 
-function renderScoreBreakdownTable(correctStates, park) {
-    const userAnswer = getStateTwoDigitCode(document.querySelector('.text-input').value);
 
-    const tbody = document.querySelector('.score-breakdown-table tbody');
-
-    let answerPoints = 0;
-    let answerMessage = '';
-    let hintMultiplier = 0;
-    let numberOfHints = 0;
-    let timeMultiplier = 1;
-    let streakMultiplier = 0;
-    let total = 0;
-
-
-    if (correctStates.find(i => i == userAnswer)) {
-        answerPoints = 100;
-        answerMessage = 'Correct';
-    } else {
-        // Formula found from https://www.movable-type.co.uk/scripts/latlong.html
-        const R = 6371e3; // metres
-        const φ1 = states[userAnswer].lat * Math.PI/180; // φ, λ in radians
-        const φ2 = park.latitude * Math.PI/180;
-        const Δφ = (park.latitude-states[userAnswer].lat) * Math.PI/180;
-        const Δλ = (park.longitude-states[userAnswer].lon) * Math.PI/180;
-
-        const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-        d = R * c * 0.000621371192; // in miles
-        let answerMultiplier = 0.75 * (1 - d/1000);
-
-        answerMultiplier = Math.min(answerMultiplier, 0.5);
-        answerMultiplier = Math.max(answerMultiplier, 0);
-        answerPoints = Math.round(100 * answerMultiplier);
-
-        answerMessage = Math.round(d) + ' Miles';
-    }
-
-    switch(hint) {
-        case 0:
-            hintMultiplier = 1.5;
-            break;
-        case 1:
-            hintMultiplier = 1.25;
-            numberOfHints  = 1;
-            break;
-        case 2:
-            hintMultiplier = 1;
-            numberOfHints = 2;
-            break;
-    }
-
-    let elapsedTime = endTime - startTime; //in ms 
-    elapsedTime /= 1000; 
-
-    let seconds = Math.round(elapsedTime);
-    
-    timeMultiplier = 1.67 * Math.abs(1 - (seconds / 80))
-    timeMultiplier = Math.round(timeMultiplier * 100) / 100;
-
-    timeMultiplier = Math.min(timeMultiplier, 1.5);
-    timeMultiplier = Math.max(timeMultiplier, 1.0);
-
-    streakMultiplier = Math.abs(0.834 + (streak / 12))
-    streakMultiplier = Math.round(streakMultiplier * 100) / 100;
-    streakMultiplier = Math.min(streakMultiplier, 1.5);
-    streakMultiplier = Math.max(streakMultiplier, 1.0);
-
-    total = Math.round(answerPoints * hintMultiplier * timeMultiplier * streakMultiplier);
-
-
-    tbody.innerHTML = `
-        <tr>
-            <td>Answer</td>
-            <td class=''>${answerMessage}</td>
-            <td class=''>${answerPoints}</td>
-        </tr>
-        <tr>
-            <td>Hints</td>
-            <td class=''>${numberOfHints} Hints</td>
-            <td>x${hintMultiplier}</td>
-        </tr>
-        <tr>
-            <td>Time</td>
-            <td class=''>${seconds} Seconds</td>
-            <td class=''>x${timeMultiplier}</td>
-        </tr>
-        <tr>
-            <td>Streak</td>
-            <td>${streak}x</td>
-            <td>x${streakMultiplier}</td>
-        </tr>
-        <tr>
-            <td>Total</td>
-            <td></td>
-            <td>${total}</td>
-        </tr>
-        `;
-
-    document.querySelector('.score').setAttribute('data-score', parseInt(document.querySelector('.score').innerHTML) + total)
-}
 
 function resetScorBreakdownTable() {
     document.querySelector('.score-breakdown-table tbody').innerHTML = `
@@ -229,30 +130,158 @@ function renderAnswer(correctAnswer, park) {
     //viewBox = {x:states[correctStates[0]].viewBox.x, y:states[correctStates[0]].viewBox.y, w:states[correctStates[0]].viewBox.w, h:states[correctStates[0]].viewBox.h};
     //document.querySelector('svg').setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`)
 
+    
+
     if (correctAnswer.includes(userAnswer)) {
         document.querySelector('.answer-container').className = document.querySelector('.answer-container').className.replace('red', 'green');
-        // document.querySelector('.answer-container i').className = 'fas fa-check fa-9x';
-        // document.querySelector('.answer-container h1').innerHTML = '+1';
         document.querySelector('.answer-container input').classList.add('btn-green-outline');
         document.querySelector('.answer-container input').classList.remove('btn-red-outline');
         for (let i of correctStates) {
             states[i].correctParks++;
         }
-        document.querySelector('.mapSvg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y}' r='${circleConstant / (viewBoxStart.w / viewBox.w)}' fill='#33ff00' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
+        createParkNode(true);
         streak += 1;
         totalCorrectAnswers += 1;
     } else {
         document.querySelector('.answer-container').className = document.querySelector('.answer-container').className.replace('green', 'red');
-        // document.querySelector('.answer-container i').className = 'fas fa-times fa-9x';
-        // document.querySelector('.answer-container h1').innerHTML = '';
         document.querySelector('.answer-container input').classList.add('btn-red-outline');
         document.querySelector('.answer-container input').classList.remove('btn-green-outline');
-        document.querySelector('.mapSvg').innerHTML += `<circle cx='${cord.x}' cy='${cord.y}' r='${circleConstant / (viewBoxStart.w / viewBox.w)}' fill='#ff4000' parkname='${park.name}' onmouseenter='showTooltip(event)' onmouseleave='hideTooltip()' ontouchstart='showTooltip(event)' ontouchend='hideTooltip()'> </circle>`
+        createParkNode(false)
         streak = 0;
     }
     document.querySelector('.state-answer').innerHTML = stateNamesString + ' - ' + park.name;
-
     renderScoreBreakdownTable(correctStates, park);
+
+    function createParkNode(answer) {
+        // Add node to dom
+        const circle = document.createElement('circle');
+        circle.textContent = 'hello'
+        circle.setAttribute('cx', cord.x);
+        circle.setAttribute('cy', cord.y);
+        circle.setAttribute('r', circleConstant / (viewBoxStart.w / viewBox.w));
+        circle.setAttribute('parkname', park.name)
+        circle.onmouseenter = (e) => showTooltip(e);
+        circle.onmouseleave = () => hideTooltip();
+        circle.ontouchstart = (e) => showTooltip(e);
+        circle.ontouchend = () => hideTooltip();
+        answer ? circle.setAttribute('fill', '#33ff00') : circle.setAttribute('fill', '#ff4000');
+        document.querySelector('.mapSvg').appendChild(circle);
+
+        // Add node to mapNodes object
+        let node = {
+            park: park.name,
+            x: cord.x,
+            y: cord.y,
+            indexed: false
+        }
+
+        mapNodes.push(node)
+
+        // new circles are not visible unless I use the line below and I don't know why 
+        document.querySelector('.mapSvg').innerHTML += '';
+    }
+
+    function renderScoreBreakdownTable(correctStates, park) {
+        const userAnswer = getStateTwoDigitCode(document.querySelector('.text-input').value);
+    
+        const tbody = document.querySelector('.score-breakdown-table tbody');
+    
+        let answerPoints = 0;
+        let answerMessage = '';
+        let hintMultiplier = 0;
+        let numberOfHints = 0;
+        let timeMultiplier = 1;
+        let streakMultiplier = 0;
+        let total = 0;
+    
+    
+        if (correctStates.find(i => i == userAnswer)) {
+            answerPoints = 100;
+            answerMessage = 'Correct';
+        } else {
+            // Formula found from https://www.movable-type.co.uk/scripts/latlong.html
+            const R = 6371e3; // metres
+            const φ1 = states[userAnswer].lat * Math.PI/180; // φ, λ in radians
+            const φ2 = park.latitude * Math.PI/180;
+            const Δφ = (park.latitude-states[userAnswer].lat) * Math.PI/180;
+            const Δλ = (park.longitude-states[userAnswer].lon) * Math.PI/180;
+    
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    
+            d = R * c * 0.000621371192; // in miles
+            let answerMultiplier = 0.75 * (1 - d/1000);
+    
+            answerMultiplier = Math.min(answerMultiplier, 0.5);
+            answerMultiplier = Math.max(answerMultiplier, 0);
+            answerPoints = Math.round(100 * answerMultiplier);
+    
+            answerMessage = Math.round(d) + ' Miles';
+        }
+    
+        switch(hint) {
+            case 0:
+                hintMultiplier = 1.5;
+                break;
+            case 1:
+                hintMultiplier = 1.25;
+                numberOfHints  = 1;
+                break;
+            case 2:
+                hintMultiplier = 1;
+                numberOfHints = 2;
+                break;
+        }
+    
+        let elapsedTime = endTime - startTime; //in ms 
+        elapsedTime /= 1000; 
+    
+        let seconds = Math.round(elapsedTime);
+        
+        timeMultiplier = 1.67 * Math.abs(1 - (seconds / 80))
+        timeMultiplier = Math.round(timeMultiplier * 100) / 100;
+    
+        timeMultiplier = Math.min(timeMultiplier, 1.5);
+        timeMultiplier = Math.max(timeMultiplier, 1.0);
+    
+        streakMultiplier = Math.abs(0.834 + (streak / 12))
+        streakMultiplier = Math.round(streakMultiplier * 100) / 100;
+        streakMultiplier = Math.min(streakMultiplier, 1.5);
+        streakMultiplier = Math.max(streakMultiplier, 1.0);
+    
+        total = Math.round(answerPoints * hintMultiplier * timeMultiplier * streakMultiplier);
+    
+    
+        tbody.innerHTML = `
+            <tr>
+                <td>Answer</td>
+                <td class=''>${answerMessage}</td>
+                <td class=''>${answerPoints}</td>
+            </tr>
+            <tr>
+                <td>Hints</td>
+                <td class=''>${numberOfHints} Hints</td>
+                <td>x${hintMultiplier}</td>
+            </tr>
+            <tr>
+                <td>Time</td>
+                <td class=''>${seconds} Seconds</td>
+                <td class=''>x${timeMultiplier}</td>
+            </tr>
+            <tr>
+                <td>Streak</td>
+                <td>${streak}x</td>
+                <td>x${streakMultiplier}</td>
+            </tr>
+            <tr>
+                <td>Total</td>
+                <td></td>
+                <td>${total}</td>
+            </tr>
+            `;
+    
+        document.querySelector('.score').setAttribute('data-score', parseInt(document.querySelector('.score').innerHTML) + total)
+    }
 }
 
 
@@ -435,17 +464,26 @@ function gamePage(data, numberOfQuestions) {
         let startX = 0;
         let startY = 0;
 
+        let currentRadius = 0;
+
         function findIntersectingNodes(node) {
             let children = [];
             let chain = [];
           
             node.indexed = true;
         
-            for (let i in field) {
-              if (field[i].x === node.x && field[i] !== node && field[i].indexed === false) {
-                children.push(field[i])
-                field[i].indexed = true;
-              }
+            for (let i in mapNodes) {
+                if (!mapNodes[i].indexed) {
+                    console.log(mapNodes[i])
+                }
+            //     var overlap = !(node.x + r < mapNodes[i].x - r || 
+            //         node.left > mapNodes[i].right || 
+            //         node.bottom < mapNodes[i].top || 
+            //         node.top > mapNodes[i].bottom)
+            //   if (overlap && mapNodes[i] !== node && mapNodes[i].indexed === false) {
+            //     children.push(mapNodes[i])
+            //     mapNodes[i].indexed = true;
+            //   }
             }
         
             if (children.length > 0) {
@@ -483,9 +521,14 @@ function gamePage(data, numberOfQuestions) {
             viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
             svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
 
+           
+
             document.querySelectorAll('circle').forEach( (circle) => {
                 circle.setAttribute('r', circleConstant / (viewBoxStart.w / viewBox.w)) 
             })
+
+            currentRadius = document.querySelector('circle').getAttribute('r');
+            console.log(findIntersectingNodes(mapNodes[0]));
         }
 
         svgContainer.onmousedown = function(e){
