@@ -114,7 +114,9 @@ function resetScorBreakdownTable() {
 }
 
 function renderAnswer(correctAnswer, park) {
-    const userAnswer = getStateTwoDigitCode(document.querySelector('.text-input').value);
+    let userAnswer = getStateTwoDigitCode(document.querySelector('.text-input').value);
+
+
     let correctStates = correctAnswer.split(',');
     let stateNamesString = '';
     for (let i in correctStates) {
@@ -402,10 +404,12 @@ function gamePage(data, numberOfQuestions) {
             if (e.key == 'Enter') {
                 if (document.querySelector('.question-mask').style.zIndex == 10 && !document.querySelector('.btn-submit').classList.contains('disabled')) {
                     // When question is displayed
-                    const values = submitBtnHandler(parks, parkIterator, correctAnswer, img);
-                    correctAnswer = values.correctAnswer;
-                    parkIterator = values.parkIterator;
-                    hint = values.hint;
+                    if (getStateTwoDigitCode(document.querySelector('.text-input').value) !== undefined) {
+                        const values = submitBtnHandler(parks, parkIterator, correctAnswer, img);
+                        correctAnswer = values.correctAnswer;
+                        parkIterator = values.parkIterator;
+                        hint = values.hint;
+                    } 
                 } else  if (document.querySelector('.answer-mask').style.zIndex == 10 && !document.querySelector('.btn-next').classList.contains('disabled')) {
                     // When answer is displayed
                     const values = nextBtnHandler(parkIterator, numberOfQuestions, parks[parkIterator + 1]);
@@ -414,11 +418,23 @@ function gamePage(data, numberOfQuestions) {
             }
         });
 
+        document.querySelector('.text-input').addEventListener('input', () => {
+            if (getStateTwoDigitCode(document.querySelector('.text-input').value) === undefined) {
+                document.querySelector('.text-input').style.border = '1px solid var(--red)';
+                document.querySelector('.text-input').style.color = 'var(--red)';
+            } else {
+                document.querySelector('.text-input').style.border = '1px solid var(--amber)';
+                document.querySelector('.text-input').style.color = 'var(--green)';
+            }
+        });
+
         document.querySelector('.btn-submit').addEventListener('click', () => {
-            const values = submitBtnHandler(parks, parkIterator, correctAnswer, img);
-            correctAnswer = values.correctAnswer;
-            parkIterator = values.parkIterator;
-            hint = values.hint;
+            if (getStateTwoDigitCode(document.querySelector('.text-input').value) !== undefined) {
+                const values = submitBtnHandler(parks, parkIterator, correctAnswer, img);
+                correctAnswer = values.correctAnswer;
+                parkIterator = values.parkIterator;
+                hint = values.hint;
+            } 
         });
 
         document.querySelector('.btn-submit').addEventListener('keypress', (e) => {
@@ -502,10 +518,13 @@ function gamePage(data, numberOfQuestions) {
             let averageY = 0;
             let parkNames = '';
 
-            for(let node of chain) {
-                averageX += node.x;
-                averageY += node.y;
-                parkNames += node.parkName + ','
+            for(let i in chain) {
+                averageX += chain[i].x;
+                averageY += chain[i].y;
+                parkNames += chain[i].parkName
+                if (i < chain.length - 1) {
+                    parkNames += ',';
+                }
             }
 
             averageX /= chain.length;
@@ -530,16 +549,22 @@ function gamePage(data, numberOfQuestions) {
         function updateChainNode(chain) {
             try {
                 let query = "";
+                let parkNames = '';
                 for (let i in chain) {
-                    query += `.chainNode[parkNames*='${chain[i].parkName}']`;
+                    query += `.chainNode[parknames*='${chain[i].parkName}']`;
                     if (i < chain.length - 1) {
                         query += ',';
                     }
+                    parkNames += chain[i].parkName
+                    if (i < chain.length - 1) {
+                        parkNames += ',';
+                    }
                 }
-                console.log(query)
+
                 const chainNode = document.querySelector(query);
                 const cirlce = chainNode.querySelector('circle');
                 const text = chainNode.querySelector('text');
+                chainNode.setAttribute('parknames', parkNames)
                 text.innerHTML = chain.length;
             } catch (err) {
                 console.log(err)
@@ -590,6 +615,8 @@ function gamePage(data, numberOfQuestions) {
             }
             for (let chain of chains) {
                 if (chain.length > 1) {
+                    let newParkNames = []
+
                     let totalVisibility = true;
                     let partialVisibility = false;
                     let previousNodeVisibility = 0;
@@ -603,13 +630,24 @@ function gamePage(data, numberOfQuestions) {
                             previousNodeVisibility = true;
                         }
                         document.querySelector(`[parkname='${node.parkName}']`).style.visibility = 'hidden';
+                        newParkNames.push(node.parkName);
                     }
                     if (totalVisibility) {addChainNode(chain)}
                     if (partialVisibility) {updateChainNode(chain)}
+
+                    const chainNode = document.querySelector(`.chainNode[parknames*='${chain[0].parkName}']`);
+                    const oldParkNames = chainNode.getAttribute('parknames').split(',');
+                    console.log('oldParks: ' + oldParkNames)
+                    console.log('newParks: ' + newParkNames)
+                    if (newParkNames.length < oldParkNames.length) {console.log('test');updateChainNode(chain)}
+                    
+
                 } else {
                     if (document.querySelector(`[parkname='${chain[0].parkName}']`).style.visibility == 'hidden') {removeChainNode(chain)}
                     document.querySelector(`[parkname='${chain[0].parkName}']`).style.visibility = 'visible';
                 }
+
+                
             }
         }
 
@@ -836,8 +874,9 @@ function gamePage(data, numberOfQuestions) {
 
 
 function submitBtnHandler(parks, parkIterator, correctAnswer, img) {
-    let currentPark = parks[parkIterator];
-    let nextPark = parks[parkIterator + 1];
+    const currentPark = parks[parkIterator];
+    const nextPark = parks[parkIterator + 1];
+    
     endTime = performance.now();
     renderAnswer(correctAnswer, currentPark);
     if (parseInt(document.querySelector('.question-mask').offsetWidth) > 0) { 
