@@ -1,6 +1,6 @@
 const transitionTimeLong = 500; // in milliseconds
 const transitionTimeShort = 300; // in milliseconds
-let viewBox = {x:593,y:861,w:354,h:399};
+let viewBox = {x:617,y:963,w:274,h:309};
 const maxWidth = 951;
 const minWidth = 48;
 const maxHeight = 1000;
@@ -11,7 +11,7 @@ let hint = 0;
 let streak = 0;
 let totalCorrectAnswers = 0;
 const circleConstant = 20;
-const viewBoxStart = {x:593,y:861,w:354,h:399};
+const viewBoxStart = {x:617,y:963,w:274,h:309};
 let mapNodes = [];
 
 
@@ -161,10 +161,10 @@ function renderAnswer(correctAnswer, park) {
         circle.setAttribute('cy', cord.y);
         circle.setAttribute('r', circleConstant / (viewBoxStart.w / viewBox.w));
         circle.setAttribute('parkname', park.name)
-        circle.onmouseenter = (e) => showTooltip(e);
-        circle.onmouseleave = () => hideTooltip();
-        circle.ontouchstart = (e) => showTooltip(e);
-        circle.ontouchend = () => hideTooltip();
+        circle.setAttribute('onmouseenter', 'showTooltip(event)');
+        circle.setAttribute('onmouseleave', 'hideTooltip()');
+        circle.setAttribute('ontouchstart', 'showTooltip(event)');
+        circle.setAttribute('ontouchend', 'hideTooltip()');
         answer ? circle.setAttribute('fill', '#33ff00') : circle.setAttribute('fill', '#ff4000');
         document.querySelector('.mapSvg').appendChild(circle);
 
@@ -474,7 +474,7 @@ function gamePage(data, numberOfQuestions) {
         let startPoint2 = {x:0,y:0};
         let endPoint2 = {x:0,y:0}
         let svgRect = svgImage.getBoundingClientRect();
-        let panningCoeficient = 2;
+        let panningCoeficient = 2.05;
         
         let startX = 0;
         let startY = 0;
@@ -540,6 +540,7 @@ function gamePage(data, numberOfQuestions) {
 
         function removeChainNode(chain) {
             try {
+                console.log(document.querySelector(`.chainNode[parkNames*='${chain[0].parkName}']`))
                 document.querySelector(`.chainNode[parkNames*='${chain[0].parkName}']`).remove();
             } catch (err) {
 
@@ -562,12 +563,26 @@ function gamePage(data, numberOfQuestions) {
                 }
 
                 const chainNode = document.querySelector(query);
-                const cirlce = chainNode.querySelector('circle');
+                const circle = chainNode.querySelector('circle');
                 const text = chainNode.querySelector('text');
                 chainNode.setAttribute('parknames', parkNames)
+                let averageX = 0;
+                let averageY = 0;
+    
+                for(let i in chain) {
+                    averageX += chain[i].x;
+                    averageY += chain[i].y;
+                }
+
+                averageX /= chain.length;
+                averageY /= chain.length;
+                circle.setAttribute('cx', averageX);
+                circle.setAttribute('cy', averageY);
+                text.setAttribute('x', averageX);
+                text.setAttribute('y', averageY);
                 text.innerHTML = chain.length;
             } catch (err) {
-                console.log(err)
+                console.error(err)
             }
         }
 
@@ -586,15 +601,20 @@ function gamePage(data, numberOfQuestions) {
                 var dw = 0;
                 var dh = 0;
             } else { 
-                var dw = w*Math.sign(-e.deltaY)*0.08;
-                var dh = h*Math.sign(-e.deltaY)*0.08;
+                var dw = w*Math.sign(-e.deltaY)*0.12;
+                var dh = h*Math.sign(-e.deltaY)*0.12;
                 var dx = dw*mx/svgSize.w;
                 var dy = dh*my/svgSize.h;
-     
+                // console.log(dw + ', ' + mx + ',' + svgSize.w)
+                // dx = dw * 1.64;
+                // dx = dw * (-0.64);
+                dx = (((mx/svgSize.w) * (1.64 - -0.64)) - 0.64) * dw
+                // console.log(mx/svgSize.w)
             }
 
     
             viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
+            console.log(viewBox)
             svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
 
            
@@ -618,33 +638,72 @@ function gamePage(data, numberOfQuestions) {
                     let newParkNames = []
 
                     let totalVisibility = true;
-                    let partialVisibility = false;
-                    let previousNodeVisibility = 0;
+                    //let partialVisibility = false;
+                    //let previousNodeVisibility = 0;
                     for (let node of chain) {
                         if (document.querySelector(`[parkname='${node.parkName}']`).style.visibility == 'hidden') {
                             totalVisibility = false;
-                            previousNodeVisibility === true ? partialVisibility = true : null;
-                            previousNodeVisibility = false;
+                            //previousNodeVisibility === true ? partialVisibility = true : null;
+                            //previousNodeVisibility = false;
                         } else {
-                            previousNodeVisibility === false ? partialVisibility = true : null;
-                            previousNodeVisibility = true;
+                            //previousNodeVisibility === false ? partialVisibility = true : null;
+                            //previousNodeVisibility = true;
                         }
                         document.querySelector(`[parkname='${node.parkName}']`).style.visibility = 'hidden';
                         newParkNames.push(node.parkName);
                     }
                     if (totalVisibility) {addChainNode(chain)}
-                    if (partialVisibility) {updateChainNode(chain)}
-
-                    const chainNode = document.querySelector(`.chainNode[parknames*='${chain[0].parkName}']`);
+                    // if (partialVisibility) {updateChainNode(chain)}
+                    
+                    let query = "";
+                    for (let i in chain) {
+                        query += `.chainNode[parknames*='${chain[i].parkName}']`;
+                        if (i < chain.length - 1) {
+                            query += ',';
+                        }
+                    }
+                    
+                    const chainNode = document.querySelector(query);
+                    //const chainNode = document.querySelector(`.chainNode[parknames*='${chain[0].parkName}']`);
+                    
                     const oldParkNames = chainNode.getAttribute('parknames').split(',');
                     console.log('oldParks: ' + oldParkNames)
                     console.log('newParks: ' + newParkNames)
-                    if (newParkNames.length < oldParkNames.length) {console.log('test');updateChainNode(chain)}
+                    if (newParkNames.length > oldParkNames.length) {
+                        //    let parkNamesDelta = [];
+                        var b1 = new Set(oldParkNames);
+                        let parkNamesDelta = [...new Set(newParkNames.filter(x => !b1.has(x)))];
+                        let query = "";
+                        for (let i in parkNamesDelta) {
+                            query += `.chainNode[parknames*='${parkNamesDelta[i]}']`;
+                            if (i < parkNamesDelta.length - 1) {
+                                query += ',';
+                            }
+                        }
+                        console.log(query)
+                        const chainNodes = document.querySelectorAll(query).forEach(chainNode => {console.log(chainNode);removeChainNode(chainNode.getAttribute('parknames').split(','))});
+                    } 
+                    if (newParkNames.length != oldParkNames.length) {
+                        updateChainNode(chain);
+                    }
+                   
                     
 
                 } else {
-                    if (document.querySelector(`[parkname='${chain[0].parkName}']`).style.visibility == 'hidden') {removeChainNode(chain)}
-                    document.querySelector(`[parkname='${chain[0].parkName}']`).style.visibility = 'visible';
+                    
+                    if (document.querySelector(`[parkname="${chain[0].parkName}"]`).style.visibility == 'hidden') {
+                        document.querySelector(`[parkname="${chain[0].parkName}"]`).style.visibility = 'visible';
+                        try {
+                            const chainNode = document.querySelector(`.chainNode[parkNames*='${chain[0].parkName}']`);
+                            if (chainNode.getAttribute('parknames').split(',').length < 3) {
+                                removeChainNode(chain)
+                            }
+                        } catch (err) {
+
+                        }
+                        
+                    }
+                    
                 }
 
                 
