@@ -10,7 +10,7 @@ let stopTime = 0;
 let hint = 0;
 let streak = 0;
 let totalCorrectAnswers = 0;
-const circleConstant = 20;
+const circleConstant = 12.5;
 const viewBoxStart = {x:617,y:963,w:274,h:309};
 let mapNodes = [];
 
@@ -532,8 +532,8 @@ function gamePage(data, numberOfQuestions) {
 
             document.querySelector('.mapSvg').innerHTML += `
                 <g class='chainNode' parkNames='${parkNames}'>
-                    <circle cx='${averageX}' cy='${averageY}' r='${circleConstant / (viewBoxStart.w / viewBox.w)}' fill='#282828' stroke='#00ff33' stroke-width='2' /> 
-                    <text x='${averageX}' y='${averageY}' text-anchor='middle' fill='white' font-size='4rem' font-family='Arial' dy=".3em">${chain.length}</text>
+                    <circle cx='${averageX}' cy='${averageY}' r='${circleConstant / (viewBoxStart.w / viewBox.w)}' fill='#282828' stroke='#00ff33' stroke-width='${circleConstant * 0.19 / (viewBoxStart.w / viewBox.w)}' /> 
+                    <text x='${averageX}' y='${averageY}' text-anchor='middle' fill='white' font-size='${circleConstant * 1.75 / (viewBoxStart.w / viewBox.w)}' font-family='Arial' dy=".3em">${chain.length}</text>
                 </g>
             `;
         }
@@ -605,22 +605,22 @@ function gamePage(data, numberOfQuestions) {
                 var dh = h*Math.sign(-e.deltaY)*0.12;
                 var dx = dw*mx/svgSize.w;
                 var dy = dh*my/svgSize.h;
-                // console.log(dw + ', ' + mx + ',' + svgSize.w)
-                // dx = dw * 1.64;
-                // dx = dw * (-0.64);
-                dx = (((mx/svgSize.w) * (1.64 - -0.64)) - 0.64) * dw
-                // console.log(mx/svgSize.w)
+                var dx = (((mx/svgSize.w) * (1.64 - -0.64)) - 0.64) * dw
             }
 
     
             viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w-dw,h:viewBox.h-dh};
-            console.log(viewBox)
             svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
 
            
 
             document.querySelectorAll('circle').forEach( (circle) => {
                 circle.setAttribute('r', circleConstant / (viewBoxStart.w / viewBox.w)) 
+            })
+
+            document.querySelectorAll('.chainNode').forEach( (circle) => {
+                circle.querySelector('circle').setAttribute('stroke-width', circleConstant * 0.19 / (viewBoxStart.w / viewBox.w)) 
+                circle.querySelector('text').setAttribute('font-size', circleConstant * 1.75 / (viewBoxStart.w / viewBox.w)) 
             })
 
             currentRadius = parseInt(document.querySelector('circle').getAttribute('r'));
