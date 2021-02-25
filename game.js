@@ -17,6 +17,7 @@ let mapNodes = [];
 
 
 function showTooltip(e) {
+    console.log(e)
     let element = e.srcElement;
     let tooltip = document.querySelector('.tooltip')
     tooltip.innerHTML = element.getAttribute('parkname');
@@ -25,6 +26,28 @@ function showTooltip(e) {
 
 function hideTooltip() {
     document.querySelector('.tooltip').style.visibility = 'hidden';
+}
+
+function expandChain(element) {
+    let parks = element.getAttribute('parknames').split(',');
+    //console.log(element)
+    let park = document.createElement('text');
+    park.innerText = 'Hello';
+    park.setAttribute('fill', 'white');
+    park.setAttribute('font-family', 'Arial');
+    park.setAttribute('font-size', '45');
+    park.setAttribute('x', element.querySelector('circle').getAttribute('cx'));
+    park.setAttribute('y', element.querySelector('circle').getAttribute('cy') - 32);
+    element.appendChild(park);
+    element.innerHTML += '';
+    
+    
+    //element.innerHTML += `<circle cx='500' cy='1000' r='10' fill='#00ff33' parkname='${parks[0]}' onmousesenter="console.log('test')" onmouseleave='hideTooltip()' ontouchstart='showTooltip(e)' ontouchend='hideTooltip()' ></circle>`;
+
+}
+
+function condenseChain() {
+
 }
 
 
@@ -482,6 +505,8 @@ function gamePage(data, numberOfQuestions) {
         let currentRadius = 0;
         
 
+
+
         function findIntersectingNodes(node) {
             let children = [];
             let chain = [];
@@ -531,17 +556,20 @@ function gamePage(data, numberOfQuestions) {
             averageY /= chain.length;
 
             document.querySelector('.mapSvg').innerHTML += `
-                <g class='chainNode' parkNames='${parkNames}'>
+                <g class='chainNode' parkNames='${parkNames}' onmouseenter='expandChain(this)' onmouseleave='condenseChain()' >
                     <circle cx='${averageX}' cy='${averageY}' r='${circleConstant / (viewBoxStart.w / viewBox.w)}' fill='#282828' stroke='#00ff33' stroke-width='${circleConstant * 0.19 / (viewBoxStart.w / viewBox.w)}' /> 
-                    <text x='${averageX}' y='${averageY}' text-anchor='middle' fill='white' font-size='${circleConstant * 1.75 / (viewBoxStart.w / viewBox.w)}' font-family='Arial' dy=".3em">${chain.length}</text>
+                    <text x='${averageX}' y='${averageY}' text-anchor='middle' fill='white' font-size='${circleConstant * 1.75 / (viewBoxStart.w / viewBox.w)}' font-family='Arial' dy=".3em" >${chain.length}</text>
                 </g>
             `;
         }
 
-        function removeChainNode(chain) {
+        function removeChainNode(chainNode) {
+           
+            let parkNames = chainNode.getAttribute('parknames').split(',');
+            console.log(parkNames)
             try {
-                console.log(document.querySelector(`.chainNode[parkNames*='${chain[0].parkName}']`))
-                document.querySelector(`.chainNode[parkNames*='${chain[0].parkName}']`).remove();
+                console.log(document.querySelector(`.chainNode[parkNames*="${parkNames[0]}"]`))
+                document.querySelector(`.chainNode[parkNames*="${parkNames[0]}"]`).remove();
             } catch (err) {
 
             }
@@ -603,7 +631,7 @@ function gamePage(data, numberOfQuestions) {
             } else { 
                 var dw = w*Math.sign(-e.deltaY)*0.12;
                 var dh = h*Math.sign(-e.deltaY)*0.12;
-                var dx = dw*mx/svgSize.w;
+                //var dx = dw*mx/svgSize.w;
                 var dy = dh*my/svgSize.h;
                 var dx = (((mx/svgSize.w) * (1.64 - -0.64)) - 0.64) * dw
             }
@@ -623,7 +651,11 @@ function gamePage(data, numberOfQuestions) {
                 circle.querySelector('text').setAttribute('font-size', circleConstant * 1.75 / (viewBoxStart.w / viewBox.w)) 
             })
 
-            currentRadius = parseInt(document.querySelector('circle').getAttribute('r'));
+            try {
+                currentRadius = parseInt(document.querySelector('circle').getAttribute('r'));
+            } catch (err) {
+
+            }
             for (let node of mapNodes) {
                node.indexed = false;
             }
@@ -637,42 +669,34 @@ function gamePage(data, numberOfQuestions) {
                 if (chain.length > 1) {
                     let newParkNames = []
 
-                    let totalVisibility = true;
-                    //let partialVisibility = false;
-                    //let previousNodeVisibility = 0;
-                    for (let node of chain) {
-                        if (document.querySelector(`[parkname='${node.parkName}']`).style.visibility == 'hidden') {
-                            totalVisibility = false;
-                            //previousNodeVisibility === true ? partialVisibility = true : null;
-                            //previousNodeVisibility = false;
-                        } else {
-                            //previousNodeVisibility === false ? partialVisibility = true : null;
-                            //previousNodeVisibility = true;
-                        }
-                        document.querySelector(`[parkname='${node.parkName}']`).style.visibility = 'hidden';
-                        newParkNames.push(node.parkName);
-                    }
-                    if (totalVisibility) {addChainNode(chain)}
-                    // if (partialVisibility) {updateChainNode(chain)}
-                    
                     let query = "";
                     for (let i in chain) {
-                        query += `.chainNode[parknames*='${chain[i].parkName}']`;
+                        query += `.chainNode[parknames*="${chain[i].parkName}"]`;
                         if (i < chain.length - 1) {
                             query += ',';
                         }
                     }
-                    
+
+                    if (document.querySelector(query) === null) {
+                        addChainNode(chain)
+                    }
                     const chainNode = document.querySelector(query);
-                    //const chainNode = document.querySelector(`.chainNode[parknames*='${chain[0].parkName}']`);
+
+                    
+                    for (let node of chain) {
+
+                        document.querySelector(`[parkname="${node.parkName}"]`).style.visibility = 'hidden';
+                        newParkNames.push(node.parkName);
+                    }
+                    
                     
                     const oldParkNames = chainNode.getAttribute('parknames').split(',');
-                    console.log('oldParks: ' + oldParkNames)
-                    console.log('newParks: ' + newParkNames)
+                    // console.log('oldParks: ' + oldParkNames)
+                    // console.log('newParks: ' + newParkNames)
                     if (newParkNames.length > oldParkNames.length) {
-                        //    let parkNamesDelta = [];
-                        var b1 = new Set(oldParkNames);
-                        let parkNamesDelta = [...new Set(newParkNames.filter(x => !b1.has(x)))];
+                        let oldParkNamesSet = new Set(oldParkNames);
+                        let parkNamesDelta = [...new Set(newParkNames.filter(x => !oldParkNamesSet.has(x)))];
+                        console.log(parkNamesDelta);
                         let query = "";
                         for (let i in parkNamesDelta) {
                             query += `.chainNode[parknames*='${parkNamesDelta[i]}']`;
@@ -680,8 +704,7 @@ function gamePage(data, numberOfQuestions) {
                                 query += ',';
                             }
                         }
-                        console.log(query)
-                        const chainNodes = document.querySelectorAll(query).forEach(chainNode => {console.log(chainNode);removeChainNode(chainNode.getAttribute('parknames').split(','))});
+                        const chainNodes = document.querySelectorAll(query).forEach(chainNode => {console.log(chainNode);removeChainNode(chainNode)});
                     } 
                     if (newParkNames.length != oldParkNames.length) {
                         updateChainNode(chain);
@@ -690,14 +713,24 @@ function gamePage(data, numberOfQuestions) {
                     
 
                 } else {
-                    
+                    // Single Node
                     if (document.querySelector(`[parkname="${chain[0].parkName}"]`).style.visibility == 'hidden') {
+                        
                         document.querySelector(`[parkname="${chain[0].parkName}"]`).style.visibility = 'visible';
                         try {
                             const chainNode = document.querySelector(`.chainNode[parkNames*='${chain[0].parkName}']`);
-                            if (chainNode.getAttribute('parknames').split(',').length < 3) {
-                                removeChainNode(chain)
+                            const parkNames = chainNode.getAttribute('parknames').split(',').filter(parkName => parkName !== chain[0].parkName);
+                            
+                            if (chains.find( chain => {
+                                if (chain.find( node => parkNames.includes(node.parkName)) && chain.length > 1) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }  
+                            }) === undefined) {
+                                removeChainNode(chainNode)
                             }
+                            
                         } catch (err) {
 
                         }
@@ -726,8 +759,8 @@ function gamePage(data, numberOfQuestions) {
             svgRect = svgImage.getBoundingClientRect();
             let tooltip = document.querySelector('.tooltip')
             let tooltipRect = tooltip.getBoundingClientRect();
-            document.querySelector('.tooltip').style.left = e.pageX - svgRect.left - ((tooltipRect.right - tooltipRect.left) / 2) + 'px';
-            document.querySelector('.tooltip').style.top = e.pageY - svgRect.top - 40 + 'px';
+            tooltip.style.left = e.pageX - svgRect.left - ((tooltipRect.right - tooltipRect.left) / 2) + 16 + 'px';
+            tooltip.style.top = e.pageY - svgRect.top - 40 + 'px';
         }
 
         svgContainer.onmouseup = function(e){
