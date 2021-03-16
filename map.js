@@ -1,32 +1,24 @@
-let viewBox = {x:617,y:963,w:274,h:309};
+//let viewBox = {x:617,y:963,w:274,h:309};
+
 const maxWidth = 951;
 const minWidth = 48;
 const maxHeight = 1000;
 const minHeight = 50;
 const circleConstant = 12.5;
-const viewBoxStart = {x:617,y:963,w:274,h:309};
+//const viewBoxStart = {x:617,y:963,w:274,h:309};
+
+const maxExpandedNode = 6;
 let mapNodes = [];
 
-function expandChain(element) {
-    let parks = element.getAttribute('parknames').split(',');
-    //console.log(element)
-    let park = document.createElement('text');
-    park.innerText = 'Hello';
-    park.setAttribute('fill', 'white');
-    park.setAttribute('font-family', 'Arial');
-    park.setAttribute('font-size', '45');
-    park.setAttribute('x', element.querySelector('circle').getAttribute('cx'));
-    park.setAttribute('y', element.querySelector('circle').getAttribute('cy') - 32);
-    element.appendChild(park);
-    element.innerHTML += '';
-    
-    
-    //element.innerHTML += `<circle cx='500' cy='1000' r='10' fill='#00ff33' parkname='${parks[0]}' onmousesenter="console.log('test')" onmouseleave='hideTooltip()' ontouchstart='showTooltip(e)' ontouchend='hideTooltip()' ></circle>`;
+function expandChainNode(chainNode) {
+    console.log('expanded')
+    chainNode.querySelectorAll('.subNode').forEach( subNode => subNode.classList.remove('hidden'));
 
 }
 
-function condenseChain() {
-
+function condenseChainNode(chainNode) {
+    console.log('condensed')
+    chainNode.querySelectorAll('.subNode').forEach( subNode => subNode.classList.add('hidden'));
 }
 
 function createParkNode(park, answerFlag) {
@@ -61,6 +53,8 @@ function createParkNode(park, answerFlag) {
 
 function addMapNavigationEventListeners() {
     let svgImage = document.querySelector('.mapSvg');
+    let viewBox = {x: 450, y: 975, w: svgImage.getBoundingClientRect().width ,h: svgImage.getBoundingClientRect().height}; 
+    let viewBoxStart = viewBox; 
     let svgContainer = document.querySelector('.svg-container');
 
     svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
@@ -131,20 +125,50 @@ function addMapNavigationEventListeners() {
         averageX /= chain.length;
         averageY /= chain.length;
 
-        document.querySelector('.mapSvg').innerHTML += `
-            <g class='chainNode' parkNames='${parkNames}' onmouseenter='expandChain(this)' onmouseleave='condenseChain()' >
-                <circle cx='${averageX}' cy='${averageY}' r='${circleConstant / (viewBoxStart.w / viewBox.w)}' fill='#282828' stroke='#00ff33' stroke-width='${circleConstant * 0.19 / (viewBoxStart.w / viewBox.w)}' /> 
-                <text x='${averageX}' y='${averageY}' text-anchor='middle' fill='white' font-size='${circleConstant * 1.75 / (viewBoxStart.w / viewBox.w)}' font-family='Arial' dy=".3em" >${chain.length}</text>
-            </g>
+        
+
+        let chainNode = document.createElementNS('http://www.w3.org/2000/svg','g');
+        chainNode.setAttribute('parknames', parkNames);
+        chainNode.classList.add('chainNode');
+        chainNode.setAttribute('onmouseenter', "expandChainNode(this)");
+        chainNode.setAttribute('onmouseleave', "condenseChainNode(this)");
+
+        chainNode.innerHTML = `
+                <circle cx='${averageX}' cy='${averageY}' r='${circleConstant / (viewBoxStart.w / viewBox.w)}' fill='#282828' fill-opacity="1" stroke='#00ff33' stroke-width='${circleConstant * 0.19 / (viewBoxStart.w / viewBox.w)}'></circle> 
+                <text x='${averageX}' y='${averageY}' text-anchor='middle' fill='white' fill-opacity='1' font-size='${circleConstant * 1.75 / (viewBoxStart.w / viewBox.w)}' font-family='Arial' dy=".3em" >${chain.length}</text>
+            
         `;
+
+
+        for (let i in chain) {
+            let subNode = document.createElementNS('http://www.w3.org/2000/svg','circle');
+            subNode.setAttribute('parkname', chain[i].parkName)
+            subNode.classList.add('subNode', 'hidden');
+            subNode.setAttribute('fill', '#33ff00');
+            subNode.setAttribute('fill-opacity', '1');
+            subNode.setAttribute('cx', averageX + Math.sin(2 * Math.PI / chain.length * i) * 80);
+            subNode.setAttribute('cy', averageY - Math.cos(2 * Math.PI / chain.length * i) * 80);
+            subNode.setAttribute('r', circleConstant / (viewBoxStart.w / viewBox.w));
+            subNode.setAttribute('onmouseenter', 'showTooltip(event)');
+            subNode.setAttribute('onmouseleave', 'hideTooltip()');
+            subNode.setAttribute('ontouchstart', 'showTooltip(event)');
+            subNode.setAttribute('ontouchend', 'hideTooltip()');
+            
+            chainNode.appendChild(subNode);
+            subNode.textContent = 'test';
+        }
+
+        document.querySelector('.mapSvg').appendChild(chainNode);
+        
+        
     }
 
     function removeChainNode(chainNode) {
        
         let parkNames = chainNode.getAttribute('parknames').split(',');
-        console.log(parkNames)
+
         try {
-            console.log(document.querySelector(`.chainNode[parkNames*="${parkNames[0]}"]`))
+           
             document.querySelector(`.chainNode[parkNames*="${parkNames[0]}"]`).remove();
         } catch (err) {
 
@@ -152,7 +176,7 @@ function addMapNavigationEventListeners() {
     }
 
     function updateChainNode(chain) {
-        try {
+        
             let query = "";
             let parkNames = '';
             for (let i in chain) {
@@ -166,9 +190,13 @@ function addMapNavigationEventListeners() {
                 }
             }
 
+
             const chainNode = document.querySelector(query);
             const circle = chainNode.querySelector('circle');
             const text = chainNode.querySelector('text');
+
+            let oldParkNamesArray = chainNode.getAttribute('parknames').split(',');
+
             chainNode.setAttribute('parknames', parkNames)
             let averageX = 0;
             let averageY = 0;
@@ -185,9 +213,37 @@ function addMapNavigationEventListeners() {
             text.setAttribute('x', averageX);
             text.setAttribute('y', averageY);
             text.innerHTML = chain.length;
-        } catch (err) {
-            console.error(err)
-        }
+
+            // update subNodes
+            // chainNode.querySelectorAll('.subNode').forEach( subNode => {
+            //     subNode.remove();
+            // })
+
+            for (let i in chain) {
+                console.log(chain[i].parkName + ': ' + oldParkNamesArray.includes(chain[i].parkName))
+                if (!oldParkNamesArray.includes(chain[i].parkName)) {
+                    let subNode = document.createElement('circle');
+                    subNode.setAttribute('parkname', chain[i].parkName)
+                    subNode.classList.add('subNode', 'hidden');
+                    subNode.setAttribute('fill', '#33ff00');
+                    subNode.setAttribute('fill-opacity', '1');
+                    subNode.setAttribute('cx', averageX + Math.sin(2 * Math.PI / chain.length * i) * 80);
+                    subNode.setAttribute('cy', averageY - Math.cos(2 * Math.PI / chain.length * i) * 80);
+                    subNode.setAttribute('r', circleConstant / (viewBoxStart.w / viewBox.w));
+                    subNode.setAttribute('onmouseenter', 'showTooltip(event)');
+                    subNode.setAttribute('onmouseleave', 'hideTooltip()');
+                    subNode.setAttribute('ontouchstart', 'showTooltip(event)');
+                    subNode.setAttribute('ontouchend', 'hideTooltip()');
+                    subNode.textContent = 'test';
+                    chainNode.appendChild(subNode);
+                }
+                
+            }
+
+            document.querySelector('.mapSvg').innerHTML += '';
+
+
+    
     }
 
     document.querySelector('.svg-container').onwheel = function(e) {
@@ -207,9 +263,9 @@ function addMapNavigationEventListeners() {
         } else { 
             var dw = w*Math.sign(-e.deltaY)*0.12;
             var dh = h*Math.sign(-e.deltaY)*0.12;
-            //var dx = dw*mx/svgSize.w;
+            var dx = dw*mx/svgSize.w;
             var dy = dh*my/svgSize.h;
-            var dx = (((mx/svgSize.w) * (1.64 - -0.64)) - 0.64) * dw
+            //var dx = (((mx/svgSize.w) * (1.64 - -0.64)) - 0.64) * dw
         }
 
 
@@ -271,7 +327,7 @@ function addMapNavigationEventListeners() {
                 if (newParkNames.length > oldParkNames.length) {
                     let oldParkNamesSet = new Set(oldParkNames);
                     let parkNamesDelta = [...new Set(newParkNames.filter(x => !oldParkNamesSet.has(x)))];
-                    console.log(parkNamesDelta);
+                    
                     let query = "";
                     for (let i in parkNamesDelta) {
                         query += `.chainNode[parknames*='${parkNamesDelta[i]}']`;
@@ -279,7 +335,7 @@ function addMapNavigationEventListeners() {
                             query += ',';
                         }
                     }
-                    const chainNodes = document.querySelectorAll(query).forEach(chainNode => {console.log(chainNode);removeChainNode(chainNode)});
+                    const chainNodes = document.querySelectorAll(query).forEach(chainNode => removeChainNode(chainNode));
                 } 
                 if (newParkNames.length != oldParkNames.length) {
                     updateChainNode(chain);
@@ -326,8 +382,8 @@ function addMapNavigationEventListeners() {
     svgContainer.onmousemove = function(e){
         if (isPanning){
             endPoint = {x:e.x,y:e.y};
-            var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
-            var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
+            var dx = (startPoint.x - endPoint.x)/scale//*panningCoeficient;
+            var dy = (startPoint.y - endPoint.y)/scale//*panningCoeficient;
             var movedViewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
             svgImage.setAttribute('viewBox', `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`);
         }
@@ -341,8 +397,8 @@ function addMapNavigationEventListeners() {
     svgContainer.onmouseup = function(e){
         if (isPanning){ 
             endPoint = {x:e.x,y:e.y};
-            var dx = (startPoint.x - endPoint.x)/scale*panningCoeficient;
-            var dy = (startPoint.y - endPoint.y)/scale*panningCoeficient;
+            var dx = (startPoint.x - endPoint.x)/scale//*//////panningCoeficient;
+            var dy = (startPoint.y - endPoint.y)/scale//*panningCoeficient;
             viewBox = {x:viewBox.x+dx,y:viewBox.y+dy,w:viewBox.w,h:viewBox.h};
             svgImage.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
             isPanning = false;

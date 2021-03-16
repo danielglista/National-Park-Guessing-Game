@@ -163,6 +163,8 @@ img.fullscreen {
     max-height: 200px;
 }
 
+
+
 path:not(.selected):hover {
    fill: var(--amber) !important;
    fill-opacity: 0.7 !important;
